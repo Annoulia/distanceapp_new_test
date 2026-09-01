@@ -232,7 +232,24 @@
 
 </div>
 
+  <div class="card">
 
+    <h2>Тест ближайшего адреса</h2>
+
+    <div class="note">
+      Тестовые координаты: Абакан, ул. Некрасова, 22В.
+    </div>
+
+    <button id="nearestTestButton">
+      Найти ближайший магазин
+    </button>
+
+    <div id="nearestTestMessage" class="status">
+      Тест ещё не запускался.
+    </div>
+
+  </div>
+  
 <script>
 
 const API_URL =
@@ -262,6 +279,12 @@ const batchMessage =
 
 const stats =
   document.getElementById("stats");
+
+const nearestTestButton =
+  document.getElementById("nearestTestButton");
+
+const nearestTestMessage =
+  document.getElementById("nearestTestMessage");  
 
 
 function getAdminKey() {
@@ -857,7 +880,147 @@ checkNewFileButton.addEventListener(
   "click",
   checkNewFile
 );
+nearestTestButton.addEventListener(
+  "click",
+  async () => {
 
+    nearestTestButton.disabled = true;
+
+    nearestTestMessage.className =
+      "status";
+
+    nearestTestMessage.textContent =
+      "Ищу ближайший магазин…";
+
+    try {
+
+      const adminKey =
+        getAdminKey();
+
+      if (!adminKey) {
+        throw new Error(
+          "Сначала введите ADMIN KEY."
+        );
+      }
+
+      const response =
+        await fetch(API_URL, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+
+            action: "find_nearest",
+
+            adminKey: adminKey,
+
+            lat: 53.72068,
+
+            lon: 91.4406019
+
+          })
+
+        });
+
+
+      const text =
+        await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(
+          "Сервер вернул не JSON.\n\n" +
+          text.slice(0, 1000)
+        );
+      }
+
+
+      if (!response.ok || data.ok === false) {
+
+        throw new Error(
+          data.error ||
+          "Ошибка HTTP " +
+          response.status
+        );
+
+      }
+
+
+      const store =
+        data.nearest;
+
+
+      nearestTestMessage.className =
+        "status success";
+
+
+      nearestTestMessage.innerHTML = `
+
+        <strong>Ближайший магазин найден!</strong>
+
+        <br><br>
+
+        <strong>Город:</strong>
+        ${escapeHtml(
+          store.city || "—"
+        )}
+
+        <br><br>
+
+        <strong>Адрес:</strong>
+        ${escapeHtml(
+          store.address || "—"
+        )}
+
+        <br><br>
+
+        <strong>Категория:</strong>
+        ${escapeHtml(
+          store.category || "—"
+        )}
+
+        <br><br>
+
+        <strong>Расстояние:</strong>
+        ${escapeHtml(
+          String(store.distanceKm)
+        )} км
+
+        <br><br>
+
+        <strong>Координаты магазина:</strong>
+        ${escapeHtml(
+          String(store.lat)
+        )},
+        ${escapeHtml(
+          String(store.lon)
+        )}
+
+      `;
+
+
+    } catch (error) {
+
+      showError(
+        nearestTestMessage,
+        error
+      );
+
+    } finally {
+
+      nearestTestButton.disabled = false;
+
+    }
+
+  }
+);
 </script>
 
 </body>

@@ -1,1 +1,1127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
+  <title>Админ — Адреса клиентов</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --green: #159447;
+      --yellow: #e2a900;
+      --red: #d83a3a;
+      --blue: #2777d4;
+      --black: #111;
+      --gray: #666;
+      --bg: #f5f6f7;
+      --card: #fff;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--black);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 5px 0 6px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: var(--gray);
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow:
+        0 2px 12px rgba(0,0,0,.06);
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .drop {
+      border: 2px dashed #bbb;
+      border-radius: 14px;
+      padding: 30px 18px;
+      text-align: center;
+      background: #fafafa;
+    }
+
+    .drop.drag {
+      border-color: var(--blue);
+      background: #f1f7ff;
+    }
+
+    .drop strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .drop span {
+      display: block;
+      color: var(--gray);
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 11px;
+      padding: 14px;
+      background: var(--black);
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    .status {
+      padding: 14px;
+      border-radius: 11px;
+      background: #f0f0f0;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .status.success {
+      background: #e9f7ee;
+      color: #176b35;
+    }
+
+    .status.error {
+      background: #fdecec;
+      color: #9e2020;
+    }
+
+    .progress-wrap {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .progress {
+      height: 12px;
+      background: #e5e5e5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: var(--blue);
+      transition: width .4s ease;
+    }
+
+    .progress-text {
+      margin-top: 8px;
+      color: var(--gray);
+      font-size: 13px;
+    }
+
+    .stats {
+      display: none;
+      grid-template-columns:
+        repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .stat {
+      background: #f3f3f3;
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      margin-top: 3px;
+      color: var(--gray);
+      font-size: 12px;
+    }
+
+    .info {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .warning {
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff5d6;
+      color: #765600;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 600px) {
+
+      .app {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>Админ — Адреса клиентов</h1>
+
+  <div class="subtitle">
+    Тестовая загрузка базы магазинов.
+    Рабочий сайт не используется.
+  </div>
+
+
+  <div class="card">
+
+    <div class="title">
+      Загрузить новый Excel
+    </div>
+
+    <div
+      id="drop"
+      class="drop"
+    >
+
+      <strong>
+        Выберите Excel-файл
+      </strong>
+
+      <span>
+        Формат .xlsx
+      </span>
+
+      <input
+        id="file"
+        type="file"
+        accept=".xlsx,.xls"
+      >
+
+    </div>
+
+
+    <button
+      id="uploadBtn"
+      disabled
+    >
+      Загрузить базу
+    </button>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="title">
+      Статус
+    </div>
+
+    <div
+      id="status"
+      class="status"
+    >
+      Выберите Excel-файл.
+    </div>
+
+
+    <div
+      id="progressWrap"
+      class="progress-wrap"
+    >
+
+      <div class="progress">
+
+        <div
+          id="progressBar"
+          class="progress-bar"
+        ></div>
+
+      </div>
+
+      <div
+        id="progressText"
+        class="progress-text"
+      >
+        Подготовка...
+      </div>
+
+    </div>
+
+
+    <div
+      id="stats"
+      class="stats"
+    >
+
+      <div class="stat">
+
+        <div
+          id="total"
+          class="stat-number"
+        >
+          0
+        </div>
+
+        <div class="stat-label">
+          Всего адресов
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div
+          id="geocoded"
+          class="stat-number"
+        >
+          0
+        </div>
+
+        <div class="stat-label">
+          Координаты получены
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div
+          id="errors"
+          class="stat-number"
+        >
+          0
+        </div>
+
+        <div class="stat-label">
+          Не найдено
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="title">
+      Требования к Excel
+    </div>
+
+    <ol class="info">
+
+      <li>
+        Категория
+      </li>
+
+      <li>
+        Город
+      </li>
+
+      <li>
+        Адрес магазина
+      </li>
+
+      <li>
+        Контрагент — необязательно
+      </li>
+
+    </ol>
+
+
+    <div class="warning">
+
+      Категории A, B, C и D поддерживаются.
+      После загрузки новая база заменяет
+      предыдущую тестовую базу.
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const API_URL =
+  "https://fn.tatnet.cloud/d81fff77-caeb-4e02-b374-407e2b3486f0/f55c92b9-2fb7-44a3-a0b7-0c7bc16ff784";
+
+
+const fileInput =
+  document.getElementById(
+    "file"
+  );
+
+const uploadBtn =
+  document.getElementById(
+    "uploadBtn"
+  );
+
+const status =
+  document.getElementById(
+    "status"
+  );
+
+const drop =
+  document.getElementById(
+    "drop"
+  );
+
+const progressWrap =
+  document.getElementById(
+    "progressWrap"
+  );
+
+const progressBar =
+  document.getElementById(
+    "progressBar"
+  );
+
+const progressText =
+  document.getElementById(
+    "progressText"
+  );
+
+const stats =
+  document.getElementById(
+    "stats"
+  );
+
+
+let selectedFile =
+  null;
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function setStatus(
+  message,
+  type = ""
+) {
+
+  status.textContent =
+    message;
+
+  status.className =
+    "status " + type;
+
+}
+
+
+/* =========================================================
+   FILE SELECT
+   ========================================================= */
+
+fileInput.addEventListener(
+  "change",
+  function() {
+
+    selectedFile =
+      this.files?.[0] ||
+      null;
+
+    updateFileState();
+
+  }
+);
+
+
+/* =========================================================
+   DRAG & DROP
+   ========================================================= */
+
+drop.addEventListener(
+  "dragover",
+  function(event) {
+
+    event.preventDefault();
+
+    drop.classList.add(
+      "drag"
+    );
+
+  }
+);
+
+
+drop.addEventListener(
+  "dragleave",
+  function() {
+
+    drop.classList.remove(
+      "drag"
+    );
+
+  }
+);
+
+
+drop.addEventListener(
+  "drop",
+  function(event) {
+
+    event.preventDefault();
+
+    drop.classList.remove(
+      "drag"
+    );
+
+    selectedFile =
+      event.dataTransfer.files?.[0] ||
+      null;
+
+    if (selectedFile) {
+
+      fileInput.files =
+        event.dataTransfer.files;
+
+    }
+
+    updateFileState();
+
+  }
+);
+
+
+/* =========================================================
+   UPDATE FILE STATE
+   ========================================================= */
+
+function updateFileState() {
+
+  if (!selectedFile) {
+
+    uploadBtn.disabled =
+      true;
+
+    setStatus(
+      "Выберите Excel-файл."
+    );
+
+    return;
+
+  }
+
+
+  const name =
+    selectedFile.name.toLowerCase();
+
+
+  if (
+    !name.endsWith(".xlsx") &&
+    !name.endsWith(".xls")
+  ) {
+
+    uploadBtn.disabled =
+      true;
+
+    setStatus(
+      "Нужен файл Excel (.xlsx или .xls).",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  uploadBtn.disabled =
+    false;
+
+
+  setStatus(
+    "Файл выбран: " +
+    selectedFile.name +
+    "\nРазмер: " +
+    formatBytes(
+      selectedFile.size
+    )
+  );
+
+}
+
+
+/* =========================================================
+   FILE → BASE64
+   ========================================================= */
+
+function fileToBase64(
+  file
+) {
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    ) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function() {
+
+          const result =
+            String(
+              reader.result || ""
+            );
+
+
+          const comma =
+            result.indexOf(",");
+
+
+          if (
+            comma === -1
+          ) {
+
+            reject(
+              new Error(
+                "Не удалось прочитать файл."
+              )
+            );
+
+            return;
+
+          }
+
+
+          resolve(
+            result.slice(
+              comma + 1
+            )
+          );
+
+        };
+
+
+      reader.onerror =
+        function() {
+
+          reject(
+            new Error(
+              "Ошибка чтения файла."
+            )
+          );
+
+        };
+
+
+      reader.readAsDataURL(
+        file
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   API
+   ========================================================= */
+
+async function api(
+  payload
+) {
+
+  const response =
+    await fetch(
+      API_URL,
+      {
+
+        method:
+          "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/json"
+
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          )
+
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+
+  let data;
+
+  try {
+
+    data =
+      JSON.parse(text);
+
+  } catch {
+
+    throw new Error(
+      "Сервер вернул некорректный ответ:\n" +
+      text
+    );
+
+  }
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      "HTTP " +
+      response.status
+    );
+
+  }
+
+
+  if (
+    data.ok === false
+  ) {
+
+    throw new Error(
+      data.error ||
+      "Ошибка сервера."
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+/* =========================================================
+   UPLOAD
+   ========================================================= */
+
+uploadBtn.addEventListener(
+  "click",
+  upload
+);
+
+
+async function upload() {
+
+  if (!selectedFile) {
+    return;
+  }
+
+
+  uploadBtn.disabled =
+    true;
+
+
+  progressWrap.style.display =
+    "block";
+
+
+  stats.style.display =
+    "none";
+
+
+  progressBar.style.width =
+    "5%";
+
+
+  progressText.textContent =
+    "Читаем Excel...";
+
+
+  setStatus(
+    "Подготавливаем загрузку..."
+  );
+
+
+  try {
+
+    const base64 =
+      await fileToBase64(
+        selectedFile
+      );
+
+
+    progressBar.style.width =
+      "20%";
+
+
+    progressText.textContent =
+      "Отправляем Excel на сервер...";
+
+
+    const uploaded =
+      await api({
+
+        action:
+          "upload",
+
+        filename:
+          selectedFile.name,
+
+        file:
+          base64
+
+      });
+
+
+    if (
+      uploaded.status !==
+      "geocoding"
+    ) {
+
+      throw new Error(
+        "Сервер не запустил обработку адресов."
+      );
+
+    }
+
+
+    progressBar.style.width =
+      "35%";
+
+
+    progressText.textContent =
+      "Geoapify обрабатывает " +
+      uploaded.total +
+      " адресов...";
+
+
+    setStatus(
+      "Excel загружен.\n" +
+      "Запущено определение координат."
+    );
+
+
+    await waitForCompletion();
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    setStatus(
+      "Ошибка:\n" +
+      error.message,
+      "error"
+    );
+
+
+    progressWrap.style.display =
+      "none";
+
+
+    uploadBtn.disabled =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   WAIT
+   ========================================================= */
+
+async function waitForCompletion() {
+
+  const started =
+    Date.now();
+
+
+  const timeout =
+    10 * 60 * 1000;
+
+
+  while (
+    Date.now() -
+    started <
+    timeout
+  ) {
+
+    await sleep(
+      4000
+    );
+
+
+    let data;
+
+    try {
+
+      data =
+        await api({
+
+          action:
+            "status"
+
+        });
+
+    } catch (error) {
+
+      /*
+         Иногда batch ещё не готов.
+         Повторяем запрос.
+      */
+
+      console.warn(
+        error
+      );
+
+      continue;
+
+    }
+
+
+    if (
+      data.status ===
+      "processing"
+    ) {
+
+      progressBar.style.width =
+        "65%";
+
+
+      progressText.textContent =
+        "Geoapify ещё обрабатывает адреса...";
+
+
+      setStatus(
+        "Обработка продолжается.\n" +
+        "Пожалуйста, не закрывайте страницу."
+      );
+
+
+      continue;
+
+    }
+
+
+    if (
+      data.status ===
+      "completed"
+    ) {
+
+      progressBar.style.width =
+        "100%";
+
+
+      progressText.textContent =
+        "Готово.";
+
+
+      showStats(
+        data
+      );
+
+
+      setStatus(
+
+        "Новая база успешно загружена.\n" +
+        "Теперь карта может использовать её.",
+
+        "success"
+
+      );
+
+
+      uploadBtn.disabled =
+        false;
+
+
+      return;
+
+    }
+
+  }
+
+
+  throw new Error(
+    "Время ожидания истекло. Проверь статус функции TatNet."
+  );
+
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+function showStats(
+  data
+) {
+
+  document.getElementById(
+    "total"
+  ).textContent =
+    data.total ??
+    0;
+
+
+  document.getElementById(
+    "geocoded"
+  ).textContent =
+    data.geocoded ??
+    0;
+
+
+  document.getElementById(
+    "errors"
+  ).textContent =
+    data.errors ??
+    0;
+
+
+  stats.style.display =
+    "grid";
+
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function sleep(
+  ms
+) {
+
+  return new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        ms
+      )
+  );
+
+}
+
+
+function formatBytes(
+  bytes
+) {
+
+  if (
+    bytes < 1024
+  ) {
+
+    return bytes +
+      " Б";
+
+  }
+
+
+  if (
+    bytes < 1024 * 1024
+  ) {
+
+    return (
+      bytes /
+      1024
+    ).toFixed(1) +
+      " КБ";
+
+  }
+
+
+  return (
+    bytes /
+    1024 /
+    1024
+  ).toFixed(1) +
+    " МБ";
+
+}
+
+</script>
+
+</body>
+</html>

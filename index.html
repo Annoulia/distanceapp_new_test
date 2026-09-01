@@ -160,10 +160,30 @@
     }
 
     #map {
-      height: 420px;
+      height: 520px;
       margin-top: 20px;
       border-radius: 16px;
       overflow: hidden;
+    }
+
+    .map-section {
+      margin-top: 20px;
+      background: #fff;
+      padding: 22px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+
+    .map-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .map-subtitle {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 10px;
     }
 
     .legend {
@@ -203,6 +223,12 @@
       background: #3488d0;
     }
 
+    .map-count {
+      margin-top: 12px;
+      color: #777;
+      font-size: 13px;
+    }
+
     .error {
       color: #b00020;
     }
@@ -226,7 +252,7 @@
       }
 
       #map {
-        height: 350px;
+        height: 420px;
       }
     }
   </style>
@@ -263,33 +289,83 @@
 
     </div>
 
-    <div id="status" class="status"></div>
+    <div id="status" class="status">
+      Загружаем базу магазинов…
+    </div>
 
   </div>
 
 
+  <!-- РЕЗУЛЬТАТ ПОИСКА -->
+
   <div id="result" class="result">
 
-    <h2>Ближайший магазин</h2>
+    <h2>
+      Ближайший магазин
+    </h2>
 
     <div class="result-row">
-      <span class="result-label">Город</span>
-      <div id="city" class="result-value"></div>
+
+      <span class="result-label">
+        Город
+      </span>
+
+      <div
+        id="city"
+        class="result-value"
+      ></div>
+
     </div>
 
     <div class="result-row">
-      <span class="result-label">Адрес магазина</span>
-      <div id="storeAddress" class="result-value"></div>
+
+      <span class="result-label">
+        Адрес магазина
+      </span>
+
+      <div
+        id="storeAddress"
+        class="result-value"
+      ></div>
+
     </div>
 
     <div class="result-row">
-      <span class="result-label">Категория</span>
+
+      <span class="result-label">
+        Категория
+      </span>
+
       <div id="category"></div>
+
     </div>
 
     <div class="result-row">
-      <span class="result-label">Расстояние</span>
-      <div id="distance" class="result-value"></div>
+
+      <span class="result-label">
+        Расстояние
+      </span>
+
+      <div
+        id="distance"
+        class="result-value"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- КАРТА ВСЕГДА ВИДНА -->
+
+  <div class="map-section">
+
+    <div class="map-title">
+      Магазины FIRST in SPACE
+    </div>
+
+    <div class="map-subtitle">
+      Все магазины отображаются на карте
     </div>
 
     <div id="map"></div>
@@ -318,12 +394,20 @@
 
     </div>
 
+    <div
+      id="mapCount"
+      class="map-count"
+    >
+      Загружаем магазины…
+    </div>
+
   </div>
 
 </div>
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 
 <script>
 
@@ -355,10 +439,21 @@
   const distance =
     document.getElementById("distance");
 
+  const mapCount =
+    document.getElementById("mapCount");
+
 
   let map = null;
+
   let userMarker = null;
-  let storeMarker = null;
+
+  let highlightedStoreMarker = null;
+
+  let allStores = [];
+
+  let storeMarkers = [];
+
+  let storesLoaded = false;
 
 
   const categoryDescriptions = {
@@ -370,6 +465,19 @@
     C: "ГОРОД ЗАКРЫТ",
 
     D: "Фирменный магазин FIRST in SPACE"
+
+  };
+
+
+  const iconColors = {
+
+    A: "#2e9d4d",
+
+    B: "#e5bd21",
+
+    C: "#d73737",
+
+    D: "#3488d0"
 
   };
 
@@ -407,6 +515,501 @@
   }
 
 
+  function createStoreIcon(categoryValue, highlighted = false) {
+
+    const letter =
+      String(categoryValue || "")
+        .trim()
+        .toUpperCase();
+
+    const color =
+      iconColors[letter] || "#111";
+
+
+    if (highlighted) {
+
+      return L.divIcon({
+
+        className: "",
+
+        html: `
+          <div style="
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: ${color};
+            border: 4px solid #111;
+            box-shadow:
+              0 0 0 4px rgba(255,255,255,.9),
+              0 3px 12px rgba(0,0,0,.45);
+          "></div>
+        `,
+
+        iconSize: [30, 30],
+
+        iconAnchor: [15, 15]
+
+      });
+
+    }
+
+
+    return L.divIcon({
+
+      className: "",
+
+      html: `
+        <div style="
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: ${color};
+          border: 3px solid white;
+          box-shadow: 0 2px 6px rgba(0,0,0,.35);
+        "></div>
+      `,
+
+      iconSize: [18, 18],
+
+      iconAnchor: [9, 9]
+
+    });
+
+  }
+
+
+  function initMap() {
+
+    if (map) {
+      return;
+    }
+
+
+    map =
+      L.map("map");
+
+
+    L.tileLayer(
+
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+      {
+
+        maxZoom: 19,
+
+        attribution:
+          "&copy; OpenStreetMap contributors"
+
+      }
+
+    ).addTo(map);
+
+  }
+
+
+  function showAllStores() {
+
+    initMap();
+
+
+    // Удаляем старые маркеры,
+    // если функция вызвана повторно
+
+    storeMarkers.forEach(marker => {
+
+      map.removeLayer(marker);
+
+    });
+
+    storeMarkers = [];
+
+
+    const validStores =
+      allStores.filter(store => {
+
+        const lat =
+          Number(store.lat);
+
+        const lon =
+          Number(store.lon);
+
+        return (
+
+          Number.isFinite(lat) &&
+
+          Number.isFinite(lon) &&
+
+          lat >= -90 &&
+          lat <= 90 &&
+
+          lon >= -180 &&
+          lon <= 180
+
+        );
+
+      });
+
+
+    validStores.forEach(store => {
+
+      const lat =
+        Number(store.lat);
+
+      const lon =
+        Number(store.lon);
+
+
+      const marker =
+        L.marker(
+
+          [lat, lon],
+
+          {
+            icon:
+              createStoreIcon(
+                store.category
+              )
+          }
+
+        )
+
+        .addTo(map)
+
+        .bindPopup(
+
+          `<b>${escapeHtml(
+            store.city || ""
+          )}</b><br>
+           ${escapeHtml(
+            store.address || ""
+          )}<br>
+           <br>
+           ${escapeHtml(
+            categoryText(
+              store.category
+            )
+          )}`
+
+        );
+
+
+      marker._storeData =
+        store;
+
+
+      storeMarkers.push(marker);
+
+    });
+
+
+    mapCount.textContent =
+      `На карте отображается магазинов: ${validStores.length}`;
+
+
+    if (validStores.length > 0) {
+
+      const bounds =
+        L.latLngBounds(
+
+          validStores.map(store => [
+
+            Number(store.lat),
+
+            Number(store.lon)
+
+          ])
+
+        );
+
+
+      map.fitBounds(
+
+        bounds,
+
+        {
+          padding: [30, 30]
+        }
+
+      );
+
+    }
+
+
+    setTimeout(() => {
+
+      if (map) {
+        map.invalidateSize();
+      }
+
+    }, 200);
+
+  }
+
+
+  async function loadStores() {
+
+    status.className = "status";
+
+    status.textContent =
+      "Загружаем базу магазинов…";
+
+
+    try {
+
+      const response =
+        await fetch(API_URL, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            action: "get_stores"
+
+          })
+
+        });
+
+
+      const data =
+        await response.json();
+
+
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
+
+        throw new Error(
+
+          data.error ||
+          "Не удалось загрузить базу магазинов."
+
+        );
+
+      }
+
+
+      allStores =
+        Array.isArray(data.stores)
+          ? data.stores
+          : [];
+
+
+      storesLoaded = true;
+
+
+      showAllStores();
+
+
+      status.textContent =
+        `База загружена. Магазинов: ${allStores.length}`;
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      status.className =
+        "status error";
+
+      status.textContent =
+        error.message ||
+        "Не удалось загрузить базу магазинов.";
+
+      mapCount.textContent =
+        "Не удалось загрузить магазины.";
+
+    }
+
+  }
+
+
+  function findMatchingMarker(store) {
+
+    if (!store) {
+      return null;
+    }
+
+
+    const storeLat =
+      Number(store.lat);
+
+    const storeLon =
+      Number(store.lon);
+
+
+    let bestMarker = null;
+
+    let bestScore = Infinity;
+
+
+    storeMarkers.forEach(marker => {
+
+      const data =
+        marker._storeData;
+
+
+      if (!data) {
+        return;
+      }
+
+
+      let score = 0;
+
+
+      if (
+        String(data.city || "")
+          .trim()
+          .toLowerCase()
+        ===
+        String(store.city || "")
+          .trim()
+          .toLowerCase()
+      ) {
+
+        score -= 10;
+
+      }
+
+
+      if (
+        String(data.address || "")
+          .trim()
+          .toLowerCase()
+        ===
+        String(store.address || "")
+          .trim()
+          .toLowerCase()
+      ) {
+
+        score -= 20;
+
+      }
+
+
+      const latDiff =
+        Math.abs(
+          Number(data.lat) -
+          storeLat
+        );
+
+
+      const lonDiff =
+        Math.abs(
+          Number(data.lon) -
+          storeLon
+        );
+
+
+      score +=
+        (latDiff + lonDiff) * 1000;
+
+
+      if (score < bestScore) {
+
+        bestScore = score;
+
+        bestMarker = marker;
+
+      }
+
+    });
+
+
+    return bestMarker;
+
+  }
+
+
+  function highlightNearestStore(store) {
+
+    initMap();
+
+
+    if (highlightedStoreMarker) {
+
+      map.removeLayer(
+        highlightedStoreMarker
+      );
+
+      highlightedStoreMarker = null;
+
+    }
+
+
+    const matchingMarker =
+      findMatchingMarker(store);
+
+
+    if (matchingMarker) {
+
+      const matchingData =
+        matchingMarker._storeData;
+
+
+      map.removeLayer(
+        matchingMarker
+      );
+
+
+      const highlighted =
+        L.marker(
+
+          [
+            Number(matchingData.lat),
+            Number(matchingData.lon)
+          ],
+
+          {
+            icon:
+              createStoreIcon(
+                matchingData.category,
+                true
+              ),
+
+            zIndexOffset: 1000
+
+          }
+
+        )
+
+        .addTo(map)
+
+        .bindPopup(
+
+          `<b>БЛИЖАЙШИЙ МАГАЗИН</b><br><br>
+           ${escapeHtml(
+            matchingData.city || ""
+           )}<br>
+           ${escapeHtml(
+            matchingData.address || ""
+           )}<br><br>
+           ${escapeHtml(
+            categoryText(
+              matchingData.category
+            )
+           )}`
+
+        );
+
+
+      highlighted._storeData =
+        matchingData;
+
+
+      highlightedStoreMarker =
+        highlighted;
+
+    }
+
+  }
+
+
   async function findNearest() {
 
     const address =
@@ -428,11 +1031,26 @@
     }
 
 
+    if (!storesLoaded) {
+
+      status.textContent =
+        "База магазинов ещё загружается. Подождите немного.";
+
+      status.className =
+        "status error";
+
+      return;
+
+    }
+
+
     searchButton.disabled = true;
 
-    result.style.display = "none";
+    result.style.display =
+      "none";
 
-    status.className = "status";
+    status.className =
+      "status";
 
     status.textContent =
       "Ищем ближайший магазин…";
@@ -446,14 +1064,19 @@
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json"
+
+            "Content-Type":
+              "application/json"
+
           },
 
           body: JSON.stringify({
 
-            action: "find_nearest",
+            action:
+              "find_nearest",
 
-            address: address
+            address:
+              address
 
           })
 
@@ -464,11 +1087,16 @@
         await response.json();
 
 
-      if (!response.ok || !data.ok) {
+      if (
+        !response.ok ||
+        !data.ok
+      ) {
 
         throw new Error(
+
           data.error ||
           "Не удалось выполнить поиск."
+
         );
 
       }
@@ -497,20 +1125,31 @@
 
       category.className =
         "category " +
-        categoryClass(store.category);
+        categoryClass(
+          store.category
+        );
 
 
       category.textContent =
-        categoryText(store.category);
+        categoryText(
+          store.category
+        );
 
 
       const distanceValue =
-        Number(store.distanceKm);
+        Number(
+          store.distanceKm
+        );
 
 
       distance.textContent =
-        Number.isFinite(distanceValue)
+
+        Number.isFinite(
+          distanceValue
+        )
+
           ? `${distanceValue.toFixed(1)} км`
+
           : "—";
 
 
@@ -522,14 +1161,17 @@
         "Магазин найден.";
 
 
-      showMap(
-        data.user,
+      showUserLocation(
+        data.user
+      );
+
+
+      highlightNearestStore(
         store
       );
 
-    }
 
-    catch (error) {
+    } catch (error) {
 
       console.error(error);
 
@@ -540,9 +1182,7 @@
         error.message ||
         "Произошла ошибка.";
 
-    }
-
-    finally {
+    } finally {
 
       searchButton.disabled =
         false;
@@ -552,34 +1192,11 @@
   }
 
 
-  function showMap(user, store) {
+  function showUserLocation(user) {
 
-    if (!user || !store) {
+    if (!user) {
       return;
     }
-
-
-    /*
-      ВАЖНО:
-
-      Leaflet принимает координаты
-      строго в формате:
-
-      [latitude, longitude]
-
-      То есть:
-
-      [широта, долгота]
-
-      Geoapify и S3 хранят их
-      отдельно как:
-
-      lat
-      lon
-
-      Поэтому здесь НИКОГДА
-      не меняем их местами.
-    */
 
 
     const userLat =
@@ -588,54 +1205,26 @@
     const userLon =
       Number(user.lon);
 
-    const storeLat =
-      Number(store.lat);
-
-    const storeLon =
-      Number(store.lon);
-
 
     if (
+
       !Number.isFinite(userLat) ||
+
       !Number.isFinite(userLon) ||
-      !Number.isFinite(storeLat) ||
-      !Number.isFinite(storeLon)
-    ) {
 
-      console.error(
-        "Некорректные координаты:",
-        {
-          userLat,
-          userLon,
-          storeLat,
-          storeLon
-        }
-      );
-
-      return;
-
-    }
-
-
-    /*
-      Проверяем диапазон координат.
-      Latitude: -90 ... 90
-      Longitude: -180 ... 180
-    */
-
-    if (
       userLat < -90 ||
+
       userLat > 90 ||
+
       userLon < -180 ||
-      userLon > 180 ||
-      storeLat < -90 ||
-      storeLat > 90 ||
-      storeLon < -180 ||
-      storeLon > 180
+
+      userLon > 180
+
     ) {
 
       console.error(
-        "Координаты вне допустимого диапазона."
+        "Некорректные координаты пользователя:",
+        user
       );
 
       return;
@@ -643,169 +1232,94 @@
     }
 
 
-    if (!map) {
-
-      map = L.map("map");
-
-      L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          maxZoom: 19,
-          attribution:
-            "&copy; OpenStreetMap contributors"
-        }
-      ).addTo(map);
-
-    }
+    initMap();
 
 
     if (userMarker) {
 
-      map.removeLayer(userMarker);
+      map.removeLayer(
+        userMarker
+      );
 
       userMarker = null;
 
     }
 
 
-    if (storeMarker) {
-
-      map.removeLayer(storeMarker);
-
-      storeMarker = null;
-
-    }
-
-
-    /*
-      ТОЧКА ПОЛЬЗОВАТЕЛЯ
-
-      [LAT, LON]
-    */
-
     userMarker =
-      L.marker([
-        userLat,
-        userLon
-      ])
+
+      L.marker(
+
+        [userLat, userLon],
+
+        {
+          zIndexOffset: 2000
+        }
+
+      )
+
       .addTo(map)
+
       .bindPopup(
         "<b>Ваш адрес</b>"
       );
 
 
-    const storeCategory =
-      String(store.category || "")
-        .trim()
-        .toUpperCase();
+    if (highlightedStoreMarker) {
+
+      const storeLat =
+        Number(
+          highlightedStoreMarker._storeData.lat
+        );
+
+      const storeLon =
+        Number(
+          highlightedStoreMarker._storeData.lon
+        );
 
 
-    const iconColors = {
+      const bounds =
+        L.latLngBounds([
 
-      A: "#2e9d4d",
+          [userLat, userLon],
 
-      B: "#e5bd21",
+          [storeLat, storeLon]
 
-      C: "#d73737",
-
-      D: "#3488d0"
-
-    };
+        ]);
 
 
-    const color =
-      iconColors[storeCategory] ||
-      "#111";
+      map.fitBounds(
 
+        bounds,
 
-    const storeIcon =
-      L.divIcon({
-
-        className: "",
-
-        html: `
-          <div style="
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: ${color};
-            border: 3px solid white;
-            box-shadow: 0 2px 7px rgba(0,0,0,.35);
-          "></div>
-        `,
-
-        iconSize: [22, 22],
-
-        iconAnchor: [11, 11]
-
-      });
-
-
-    /*
-      ТОЧКА МАГАЗИНА
-
-      [LAT, LON]
-
-      НЕ [LON, LAT]
-    */
-
-    storeMarker =
-      L.marker(
-        [
-          storeLat,
-          storeLon
-        ],
         {
-          icon: storeIcon
+
+          padding: [50, 50],
+
+          maxZoom: 15
+
         }
-      )
-      .addTo(map)
-      .bindPopup(
-        `<b>${escapeHtml(store.city || "")}</b><br>
-         ${escapeHtml(store.address || "")}`
+
       );
 
+    }
 
-    /*
-      Показываем на карте
-      и пользователя, и магазин.
-    */
+    else {
 
-    const bounds =
-      L.latLngBounds([
+      map.setView(
+        [userLat, userLon],
+        12
+      );
 
-        [
-          userLat,
-          userLon
-        ],
+    }
 
-        [
-          storeLat,
-          storeLon
-        ]
-
-      ]);
-
-
-    map.fitBounds(
-      bounds,
-      {
-        padding: [40, 40],
-        maxZoom: 15
-      }
-    );
-
-
-    /*
-      После показа карты Leaflet иногда
-      требуется пересчитать размеры,
-      особенно на мобильном.
-    */
 
     setTimeout(() => {
 
       if (map) {
+
         map.invalidateSize();
+
       }
 
     }, 100);
@@ -846,23 +1360,39 @@
 
 
   searchButton.addEventListener(
+
     "click",
+
     findNearest
+
   );
 
 
   addressInput.addEventListener(
+
     "keydown",
+
     event => {
 
-      if (event.key === "Enter") {
+      if (
+        event.key === "Enter"
+      ) {
 
         findNearest();
 
       }
 
     }
+
   );
+
+
+  // Запускаем загрузку базы
+  // сразу при открытии страницы
+
+  initMap();
+
+  loadStores();
 
 </script>
 

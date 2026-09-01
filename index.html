@@ -1,1910 +1,673 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Адреса клиентов</title>
-
+  <title>FIRST in SPACE — Ближайший магазин</title>
 
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  >
-
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  ></script>
-
+  />
 
   <style>
-
     * {
       box-sizing: border-box;
     }
 
-    :root {
-
-      --green: #159447;
-      --yellow: #e2a900;
-      --red: #d83a3a;
-      --black: #111;
-      --gray: #6f6f6f;
-      --bg: #f5f6f7;
-      --card: #fff;
-
-    }
-
-
     body {
-
       margin: 0;
-
-      background: var(--bg);
-
-      color: var(--black);
-
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #111;
     }
 
-
-    .app {
-
-      max-width: 1150px;
-
+    .container {
+      width: min(900px, calc(100% - 32px));
       margin: 0 auto;
-
-      padding: 16px;
-
+      padding: 32px 0;
     }
-
 
     h1 {
-
-      margin: 4px 0 6px;
-
+      margin: 0 0 8px;
       font-size: 28px;
-
+      font-weight: 700;
     }
-
 
     .subtitle {
-
-      color: var(--gray);
-
-      margin-bottom: 18px;
-
-      font-size: 14px;
-
+      margin-bottom: 28px;
+      color: #666;
+      font-size: 15px;
     }
 
-
-    .card {
-
-      background: var(--card);
-
+    .search-box {
+      background: #fff;
+      padding: 20px;
       border-radius: 16px;
-
-      padding: 18px;
-
-      margin-bottom: 15px;
-
-      box-shadow:
-        0 2px 12px rgba(0,0,0,.06);
-
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
     }
-
-
-    .section-title {
-
-      font-size: 18px;
-
-      font-weight: 800;
-
-      margin-bottom: 13px;
-
-    }
-
 
     label {
-
       display: block;
-
-      font-weight: 700;
-
       margin-bottom: 8px;
-
+      font-size: 14px;
+      font-weight: 600;
     }
 
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
 
-    input[type="text"] {
-
-      width: 100%;
-
-      padding: 13px 14px;
-
-      border: 1px solid #cfcfcf;
-
+    input {
+      flex: 1;
+      min-width: 0;
+      height: 50px;
+      padding: 0 16px;
+      border: 1px solid #d5d5d5;
       border-radius: 10px;
-
       font-size: 16px;
-
       outline: none;
-
     }
 
-
-    input[type="text"]:focus {
-
-      border-color: #777;
-
+    input:focus {
+      border-color: #111;
     }
-
 
     button {
-
-      width: 100%;
-
-      margin-top: 10px;
-
-      padding: 14px;
-
+      height: 50px;
+      padding: 0 22px;
       border: 0;
-
       border-radius: 10px;
-
       background: #111;
-
       color: #fff;
-
-      font-size: 16px;
-
-      font-weight: 700;
-
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-
     }
-
 
     button:disabled {
-
-      opacity: .5;
-
-      cursor: default;
-
+      opacity: .6;
+      cursor: wait;
     }
-
-
-    .filters {
-
-      display: flex;
-
-      flex-wrap: wrap;
-
-      gap: 8px;
-
-      margin-bottom: 15px;
-
-    }
-
-
-    .filter-btn {
-
-      width: auto;
-
-      margin: 0;
-
-      padding: 8px 13px;
-
-      border-radius: 999px;
-
-      background: #eee;
-
-      color: #111;
-
-      font-size: 14px;
-
-    }
-
-
-    .filter-btn.active {
-
-      background: #111;
-
-      color: #fff;
-
-    }
-
-
-    #map {
-
-      width: 100%;
-
-      height: 520px;
-
-      border-radius: 14px;
-
-      overflow: hidden;
-
-      background: #e9e9e9;
-
-    }
-
 
     .status {
-
-      margin-top: 12px;
-
-      padding: 12px;
-
-      border-radius: 10px;
-
-      background: #f1f1f1;
-
-      color: #555;
-
+      margin-top: 14px;
       font-size: 14px;
-
-      line-height: 1.45;
-
-      white-space: pre-line;
-
+      color: #666;
+      min-height: 20px;
     }
-
-
-    .status.success {
-
-      background: #e9f7ee;
-
-      color: #176b35;
-
-    }
-
-
-    .status.error {
-
-      background: #fdecec;
-
-      color: #9e2020;
-
-    }
-
 
     .result {
-
       display: none;
-
-      margin-top: 15px;
-
-      padding: 17px;
-
-      border-radius: 13px;
-
-      background: #f2f3f4;
-
+      margin-top: 20px;
+      background: #fff;
+      padding: 22px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
     }
 
-
-    .result-title {
-
-      font-size: 19px;
-
-      font-weight: 800;
-
-      margin-bottom: 8px;
-
+    .result h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
     }
 
-
-    .distance {
-
-      font-size: 30px;
-
-      font-weight: 800;
-
-      margin: 8px 0 12px;
-
+    .result-row {
+      margin-bottom: 14px;
     }
 
-
-    .result-address {
-
-      font-size: 16px;
-
-      line-height: 1.45;
-
-      margin-bottom: 12px;
-
-    }
-
-
-    .category-badge {
-
-      display: inline-flex;
-
-      padding: 7px 11px;
-
-      border-radius: 999px;
-
-      color: white;
-
+    .result-label {
+      display: block;
+      margin-bottom: 4px;
+      color: #777;
       font-size: 13px;
-
-      font-weight: 800;
-
     }
 
+    .result-value {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .category {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
 
     .category-a {
-      background: var(--green);
+      background: #dff3e4;
+      color: #176b2c;
     }
-
 
     .category-b {
-
-      background: var(--yellow);
-
-      color: #111;
-
+      background: #fff2bf;
+      color: #765d00;
     }
-
 
     .category-c {
-      background: var(--red);
+      background: #ffdcdc;
+      color: #9a1f1f;
     }
-
 
     .category-d {
-      background: #111;
+      background: #dcecff;
+      color: #14558c;
     }
 
-
-    .category-comment {
-
-      margin-top: 10px;
-
-      font-size: 15px;
-
-      font-weight: 600;
-
+    #map {
+      height: 420px;
+      margin-top: 20px;
+      border-radius: 16px;
+      overflow: hidden;
     }
-
 
     .legend {
-
-      display: grid;
-
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-
-      margin-top: 15px;
-
+      margin-top: 16px;
     }
-
 
     .legend-item {
-
       display: flex;
-
-      align-items: flex-start;
-
-      gap: 10px;
-
-      padding: 11px 12px;
-
-      border-radius: 11px;
-
-      background: #f4f4f4;
-
-      font-size: 14px;
-
-      line-height: 1.4;
-
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #555;
     }
-
 
     .legend-dot {
-
-      flex: 0 0 auto;
-
-      width: 14px;
-
-      height: 14px;
-
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
-
-      margin-top: 2px;
-
     }
 
-
-    .legend-dot.a {
-      background: var(--green);
+    .dot-a {
+      background: #2e9d4d;
     }
 
-
-    .legend-dot.b {
-      background: var(--yellow);
+    .dot-b {
+      background: #e5bd21;
     }
 
-
-    .legend-dot.c {
-      background: var(--red);
+    .dot-c {
+      background: #d73737;
     }
 
-
-    .legend-dot.d {
-      background: #111;
+    .dot-d {
+      background: #3488d0;
     }
 
+    .error {
+      color: #b00020;
+    }
 
-    @media (max-width: 600px) {
-
-      .app {
-        padding: 10px;
+    @media (max-width: 650px) {
+      .container {
+        width: min(100% - 20px, 900px);
+        padding: 20px 0;
       }
 
       h1 {
-        font-size: 23px;
+        font-size: 24px;
       }
 
-      .card {
-        padding: 14px;
+      .input-row {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
       }
 
       #map {
-        height: 430px;
+        height: 350px;
       }
-
-      .distance {
-        font-size: 27px;
-      }
-
     }
-
   </style>
-
 </head>
-
 
 <body>
 
+<div class="container">
 
-<div class="app">
-
-
-  <h1>
-    Адреса клиентов
-  </h1>
-
+  <h1>FIRST in SPACE</h1>
 
   <div class="subtitle">
-    Тестовая версия
+    Поиск ближайшего магазина
   </div>
 
-
-  <div class="card">
-
-
-    <div class="section-title">
-      Проверка адреса
-    </div>
-
+  <div class="search-box">
 
     <label for="address">
-      Введите российский адрес
+      Введите адрес
     </label>
 
+    <div class="input-row">
+      <input
+        id="address"
+        type="text"
+        placeholder="Например: Абакан, ул. Некрасова, 22В"
+        autocomplete="street-address"
+      >
 
-    <input
-      id="address"
-      type="text"
-      autocomplete="street-address"
-      placeholder="Например: Ставрополь, Мира 10"
-    >
-
-
-    <button id="searchBtn">
-      Найти ближайший магазин
-    </button>
-
-
-    <div
-      id="status"
-      class="status"
-    >
-      Загружаем актуальную базу...
+      <button id="searchButton">
+        Найти ближайший
+      </button>
     </div>
 
-
-    <div
-      id="result"
-      class="result"
-    ></div>
-
+    <div id="status" class="status"></div>
 
   </div>
 
 
-  <div class="card">
+  <div id="result" class="result">
 
+    <h2>Ближайший магазин</h2>
 
-    <div class="section-title">
-      Карта магазинов
+    <div class="result-row">
+      <span class="result-label">Город</span>
+      <div id="city" class="result-value"></div>
     </div>
 
-
-    <div class="filters">
-
-      <button
-        class="filter-btn active"
-        data-category="ALL"
-      >
-        Все
-      </button>
-
-      <button
-        class="filter-btn"
-        data-category="A"
-      >
-        A
-      </button>
-
-      <button
-        class="filter-btn"
-        data-category="B"
-      >
-        B
-      </button>
-
-      <button
-        class="filter-btn"
-        data-category="C"
-      >
-        C
-      </button>
-
-      <button
-        class="filter-btn"
-        data-category="D"
-      >
-        D
-      </button>
-
+    <div class="result-row">
+      <span class="result-label">Адрес магазина</span>
+      <div id="storeAddress" class="result-value"></div>
     </div>
 
+    <div class="result-row">
+      <span class="result-label">Категория</span>
+      <div id="category"></div>
+    </div>
+
+    <div class="result-row">
+      <span class="result-label">Расстояние</span>
+      <div id="distance" class="result-value"></div>
+    </div>
 
     <div id="map"></div>
-
 
     <div class="legend">
 
       <div class="legend-item">
-
-        <span class="legend-dot a"></span>
-
-        <div>
-
-          <strong>A</strong><br>
-
-          За этим адресом территория
-          не закрыта
-
-        </div>
-
+        <span class="legend-dot dot-a"></span>
+        A — Территория не закрыта за магазином
       </div>
 
-
       <div class="legend-item">
-
-        <span class="legend-dot b"></span>
-
-        <div>
-
-          <strong>B</strong><br>
-
-          За магазином закрыта
-          территория радиусом 2 км
-
-        </div>
-
+        <span class="legend-dot dot-b"></span>
+        B — Закрытая территория, радиус 2 км
       </div>
 
-
       <div class="legend-item">
-
-        <span class="legend-dot c"></span>
-
-        <div>
-
-          <strong>C</strong><br>
-
-          ГОРОД ЗАКРЫТ
-
-        </div>
-
+        <span class="legend-dot dot-c"></span>
+        C — ГОРОД ЗАКРЫТ
       </div>
 
-
       <div class="legend-item">
-
-        <span class="legend-dot d"></span>
-
-        <div>
-
-          <strong>D</strong><br>
-
-          Фирменный магазин
-          First in Space
-
-        </div>
-
+        <span class="legend-dot dot-d"></span>
+        D — Фирменный магазин FIRST in SPACE
       </div>
 
     </div>
 
-
   </div>
-
 
 </div>
 
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 
-
-/* =========================================================
-   API
-   ========================================================= */
-
-const API_URL =
-  "https://fn.tatnet.cloud/d81fff77-caeb-4e02-b374-407e2b3486f0/f55c92b9-2fb7-44a3-a0b7-0c7bc16ff784";
+  const API_URL =
+    "https://fn.tatnet.cloud/d81fff77-caeb-4e02-b374-407e2b3486f0/f55c92b9-2fb7-44a3-a0b7-0c7bc16ff784";
 
 
-const GEOAPIFY_KEY =
-  "2a439c56d224427497d809155bdc6769";
+  const addressInput =
+    document.getElementById("address");
 
+  const searchButton =
+    document.getElementById("searchButton");
 
-/* =========================================================
-   DATA
-   ========================================================= */
-
-let stores = [];
-
-let map = null;
-
-let storeMarkers = [];
-
-let userMarker = null;
-
-let currentFilter = "ALL";
-
-
-/* =========================================================
-   CATEGORY INFO
-   ========================================================= */
-
-const CATEGORY_INFO = {
-
-  A: {
-
-    comment:
-      "За этим адресом территория не закрыта",
-
-    color:
-      "#159447"
-
-  },
-
-
-  B: {
-
-    comment:
-      "За магазином закрыта территория радиусом 2 км",
-
-    color:
-      "#e2a900"
-
-  },
-
-
-  C: {
-
-    comment:
-      "ГОРОД ЗАКРЫТ",
-
-    color:
-      "#d83a3a"
-
-  },
-
-
-  D: {
-
-    comment:
-      "Фирменный магазин First in Space",
-
-    color:
-      "#111111"
-
-  }
-
-};
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-function setStatus(
-  message,
-  type = ""
-) {
-
-  const element =
+  const status =
     document.getElementById("status");
 
-  element.textContent =
-    message;
+  const result =
+    document.getElementById("result");
 
-  element.className =
-    "status " + type;
+  const city =
+    document.getElementById("city");
 
-}
+  const storeAddress =
+    document.getElementById("storeAddress");
 
+  const category =
+    document.getElementById("category");
 
-/* =========================================================
-   ESCAPE
-   ========================================================= */
+  const distance =
+    document.getElementById("distance");
 
-function escapeHtml(value) {
 
-  return String(value || "")
+  let map = null;
+  let userMarker = null;
+  let storeMarker = null;
 
-    .replaceAll("&", "&amp;")
 
-    .replaceAll("<", "&lt;")
+  const categoryDescriptions = {
 
-    .replaceAll(">", "&gt;")
+    A: "Территория не закрыта за магазином",
 
-    .replaceAll('"', "&quot;")
+    B: "Закрытая территория, радиус 2 км",
 
-    .replaceAll("'", "&#039;");
+    C: "ГОРОД ЗАКРЫТ",
 
-}
-
-
-/* =========================================================
-   API
-   ========================================================= */
-
-async function api(payload) {
-
-  const response =
-    await fetch(
-      API_URL,
-      {
-
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify(payload)
-
-      }
-    );
-
-
-  const text =
-    await response.text();
-
-
-  let data;
-
-
-  try {
-
-    data =
-      JSON.parse(text);
-
-  } catch {
-
-    throw new Error(
-      "Сервер вернул некорректный ответ."
-    );
-
-  }
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      data.error ||
-      "HTTP " +
-      response.status
-    );
-
-  }
-
-
-  if (data.ok === false) {
-
-    throw new Error(
-      data.error ||
-      "Ошибка API."
-    );
-
-  }
-
-
-  return data;
-
-}
-
-
-/* =========================================================
-   NUMBER NORMALIZATION
-   ========================================================= */
-
-function safeCoordinate(value) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-
-    return null;
-
-  }
-
-
-  const number =
-    Number(
-      String(value)
-        .trim()
-        .replace(",", ".")
-    );
-
-
-  if (!Number.isFinite(number)) {
-
-    return null;
-
-  }
-
-
-  return number;
-
-}
-
-
-/* =========================================================
-   VALIDATE COORDINATES
-   ========================================================= */
-
-function validCoordinates(
-  lat,
-  lon
-) {
-
-  const latitude =
-    safeCoordinate(lat);
-
-  const longitude =
-    safeCoordinate(lon);
-
-
-  if (
-    latitude === null ||
-    longitude === null
-  ) {
-
-    return false;
-
-  }
-
-
-  /*
-     Для России широта и долгота
-     должны находиться примерно
-     в следующих пределах.
-  */
-
-  if (
-    latitude < 40 ||
-    latitude > 82
-  ) {
-
-    return false;
-
-  }
-
-
-  if (
-    longitude < 19 ||
-    longitude > 180
-  ) {
-
-    return false;
-
-  }
-
-
-  return true;
-
-}
-
-
-/* =========================================================
-   NORMALIZE STORE
-   ========================================================= */
-
-function normalizeStore(store) {
-
-  if (!store) {
-
-    return null;
-
-  }
-
-
-  const lat =
-    safeCoordinate(
-      store.lat
-    );
-
-
-  const lon =
-    safeCoordinate(
-      store.lon
-    );
-
-
-  if (
-    !validCoordinates(
-      lat,
-      lon
-    )
-  ) {
-
-    console.warn(
-      "Пропущена некорректная координата:",
-      store
-    );
-
-    return null;
-
-  }
-
-
-  return {
-
-    ...store,
-
-    lat,
-
-    lon,
-
-    category:
-      String(
-        store.category || "A"
-      )
-        .trim()
-        .toUpperCase(),
-
-    region:
-      String(
-        store.region || ""
-      ).trim(),
-
-    city:
-      String(
-        store.city || ""
-      ).trim(),
-
-    address:
-      String(
-        store.address || ""
-      ).trim()
+    D: "Фирменный магазин FIRST in SPACE"
 
   };
 
-}
+
+  function categoryClass(value) {
+
+    const letter =
+      String(value || "")
+        .trim()
+        .toUpperCase();
+
+    return "category-" + letter.toLowerCase();
+
+  }
 
 
-/* =========================================================
-   LOAD STORES
-   ========================================================= */
+  function categoryText(value) {
 
-async function loadStores() {
+    const letter =
+      String(value || "")
+        .trim()
+        .toUpperCase();
 
-  setStatus(
-    "Загружаем актуальную базу..."
-  );
+    const description =
+      categoryDescriptions[letter] || "";
 
+    if (description) {
+      return `Категория ${letter} — ${description}`;
+    }
 
-  try {
+    return `Категория ${letter}`;
 
-    const data =
-      await api({
-        action: "stores"
-      });
-
-
-    const rawStores =
-      Array.isArray(data.stores)
-        ? data.stores
-        : [];
+  }
 
 
-    stores =
-      rawStores
-        .map(normalizeStore)
-        .filter(Boolean);
+  async function findNearest() {
 
+    const address =
+      addressInput.value.trim();
 
-    if (!stores.length) {
+    if (!address) {
 
-      throw new Error(
-        "В базе нет корректных координат."
-      );
+      status.textContent =
+        "Введите адрес.";
 
+      status.className =
+        "status error";
+
+      addressInput.focus();
+
+      return;
     }
 
 
-    drawStoreMarkers();
+    searchButton.disabled = true;
 
+    result.style.display = "none";
 
-    /*
-       Подстраиваем карту
-       под реальные точки.
-    */
+    status.className = "status";
 
-    fitMapToStores();
+    status.textContent =
+      "Ищем ближайший магазин…";
 
-
-    setStatus(
-
-      "База загружена. Адресов: " +
-      stores.length,
-
-      "success"
-
-    );
-
-
-    console.log(
-      "Всего записей:",
-      rawStores.length
-    );
-
-
-    console.log(
-      "Корректных координат:",
-      stores.length
-    );
-
-
-    console.log(
-      "Первая запись:",
-      stores[0]
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-
-    setStatus(
-      error.message,
-      "error"
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   FIT MAP
-   ========================================================= */
-
-function fitMapToStores() {
-
-  if (
-    !map ||
-    !stores.length
-  ) {
-
-    return;
-
-  }
-
-
-  const points =
-    stores.map(
-      store => [
-        store.lat,
-        store.lon
-      ]
-    );
-
-
-  const bounds =
-    L.latLngBounds(points);
-
-
-  if (
-    bounds.isValid()
-  ) {
-
-    map.fitBounds(
-      bounds,
-      {
-        padding: [30, 30]
-      }
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   DISTANCE
-   ========================================================= */
-
-function toRadians(
-  degrees
-) {
-
-  return (
-    degrees *
-    Math.PI /
-    180
-  );
-
-}
-
-
-function distanceKm(
-  lat1,
-  lon1,
-  lat2,
-  lon2
-) {
-
-  const R = 6371;
-
-
-  const dLat =
-    toRadians(
-      lat2 - lat1
-    );
-
-
-  const dLon =
-    toRadians(
-      lon2 - lon1
-    );
-
-
-  const a =
-
-    Math.sin(
-      dLat / 2
-    ) ** 2 +
-
-    Math.cos(
-      toRadians(lat1)
-    ) *
-
-    Math.cos(
-      toRadians(lat2)
-    ) *
-
-    Math.sin(
-      dLon / 2
-    ) ** 2;
-
-
-  const c =
-    2 *
-    Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1 - a)
-    );
-
-
-  return R * c;
-
-}
-
-
-/* =========================================================
-   MARKER ICON
-   ========================================================= */
-
-function createMarkerIcon(
-  category
-) {
-
-  const color =
-    CATEGORY_INFO[
-      category
-    ]?.color ||
-    "#111";
-
-
-  return L.divIcon({
-
-    className:
-      "store-marker",
-
-    html:
-      `
-        <div
-          style="
-            width:22px;
-            height:22px;
-            border-radius:50%;
-            background:${color};
-            border:3px solid white;
-            box-shadow:0 2px 6px rgba(0,0,0,.35);
-          "
-        ></div>
-      `,
-
-    iconSize:
-      [22, 22],
-
-    iconAnchor:
-      [11, 11]
-
-  });
-
-}
-
-
-/* =========================================================
-   CLEAR MARKERS
-   ========================================================= */
-
-function clearStoreMarkers() {
-
-  storeMarkers.forEach(
-    marker => {
-
-      try {
-
-        map.removeLayer(marker);
-
-      } catch {}
-
-    }
-  );
-
-
-  storeMarkers = [];
-
-}
-
-
-/* =========================================================
-   DRAW MARKERS
-   ========================================================= */
-
-function drawStoreMarkers() {
-
-  if (!map) {
-
-    return;
-
-  }
-
-
-  clearStoreMarkers();
-
-
-  const visible =
-    stores.filter(
-      store => {
-
-        if (
-          currentFilter ===
-          "ALL"
-        ) {
-
-          return true;
-
-        }
-
-
-        return (
-          store.category ===
-          currentFilter
-        );
-
-      }
-    );
-
-
-  visible.forEach(
-    store => {
-
-      const category =
-        store.category;
-
-
-      const marker =
-        L.marker(
-
-          [
-            store.lat,
-            store.lon
-          ],
-
-          {
-            icon:
-              createMarkerIcon(
-                category
-              )
-          }
-
-        );
-
-
-      const info =
-        CATEGORY_INFO[
-          category
-        ] ||
-        CATEGORY_INFO.A;
-
-
-      const fullAddress =
-        [
-
-          store.region,
-
-          store.city,
-
-          store.address
-
-        ]
-          .filter(Boolean)
-          .join(", ");
-
-
-      marker.bindPopup(
-
-        `
-          <div
-            style="
-              min-width:210px;
-              font-family:Arial,sans-serif;
-            "
-          >
-
-            <div
-              style="
-                font-weight:800;
-                font-size:16px;
-                margin-bottom:7px;
-              "
-            >
-              ${escapeHtml(
-                store.city
-              )}
-            </div>
-
-
-            <div
-              style="
-                font-size:14px;
-                line-height:1.4;
-                margin-bottom:8px;
-              "
-            >
-              ${escapeHtml(
-                fullAddress
-              )}
-            </div>
-
-
-            <div
-              style="
-                display:inline-block;
-                padding:5px 9px;
-                border-radius:999px;
-                background:${info.color};
-                color:${
-                  category === "B"
-                    ? "#111"
-                    : "#fff"
-                };
-                font-weight:800;
-                font-size:12px;
-              "
-            >
-              Категория
-              ${escapeHtml(category)}
-            </div>
-
-
-            <div
-              style="
-                margin-top:8px;
-                font-size:13px;
-                line-height:1.4;
-              "
-            >
-              ${escapeHtml(
-                info.comment
-              )}
-            </div>
-
-          </div>
-        `
-
-      );
-
-
-      marker.addTo(map);
-
-
-      storeMarkers.push(marker);
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   USER MARKER
-   ========================================================= */
-
-function showUserMarker(
-  lat,
-  lon
-) {
-
-  if (userMarker) {
 
     try {
 
-      map.removeLayer(
-        userMarker
-      );
+      const response =
+        await fetch(API_URL, {
 
-    } catch {}
+          method: "POST",
 
-  }
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+
+            action: "find_nearest",
+
+            address: address
+
+          })
+
+        });
 
 
-  userMarker =
-    L.marker(
+      const data =
+        await response.json();
 
-      [
-        lat,
-        lon
-      ],
 
-      {
+      if (!response.ok || !data.ok) {
 
-        icon:
-          L.divIcon({
-
-            className:
-              "user-marker",
-
-            html:
-              `
-                <div
-                  style="
-                    width:18px;
-                    height:18px;
-                    border-radius:50%;
-                    background:#111;
-                    border:4px solid white;
-                    box-shadow:0 2px 8px rgba(0,0,0,.45);
-                  "
-                ></div>
-              `,
-
-            iconSize:
-              [18, 18],
-
-            iconAnchor:
-              [9, 9]
-
-          }),
-
-        zIndexOffset:
-          1000
+        throw new Error(
+          data.error ||
+          "Не удалось выполнить поиск."
+        );
 
       }
 
-    );
 
+      if (!data.store) {
 
-  userMarker.addTo(map);
-
-}
-
-
-/* =========================================================
-   RESULT
-   ========================================================= */
-
-function showResult(
-  store,
-  distance
-) {
-
-  const result =
-    document.getElementById(
-      "result"
-    );
-
-
-  const category =
-    store.category;
-
-
-  const info =
-    CATEGORY_INFO[
-      category
-    ] ||
-    CATEGORY_INFO.A;
-
-
-  result.style.display =
-    "block";
-
-
-  result.innerHTML =
-
-    `
-
-      <div class="result-title">
-        Ближайший магазин
-      </div>
-
-
-      <div class="distance">
-        ${distance.toFixed(1)} км
-      </div>
-
-
-      <div class="result-address">
-
-        ${escapeHtml(
-          [
-            store.region,
-            store.city,
-            store.address
-          ]
-            .filter(Boolean)
-            .join(", ")
-        )}
-
-      </div>
-
-
-      <span
-        class="
-          category-badge
-          ${
-            category === "A"
-              ? "category-a"
-              : ""
-          }
-          ${
-            category === "B"
-              ? "category-b"
-              : ""
-          }
-          ${
-            category === "C"
-              ? "category-c"
-              : ""
-          }
-          ${
-            category === "D"
-              ? "category-d"
-              : ""
-          }
-        "
-      >
-        Категория
-        ${escapeHtml(category)}
-      </span>
-
-
-      <div class="category-comment">
-        ${escapeHtml(
-          info.comment
-        )}
-      </div>
-
-    `;
-
-}
-
-
-/* =========================================================
-   GEOCODE USER
-   ========================================================= */
-
-async function geocodeAddress(
-  address
-) {
-
-  let query =
-    address;
-
-
-  const lower =
-    address.toLowerCase();
-
-
-  if (
-    !lower.includes("россия") &&
-    !lower.includes("russia")
-  ) {
-
-    query +=
-      ", Россия";
-
-  }
-
-
-  const url =
-
-    "https://api.geoapify.com/v1/geocode/search" +
-
-    "?text=" +
-    encodeURIComponent(query) +
-
-    "&filter=countrycode:ru" +
-
-    "&limit=1" +
-
-    "&format=json" +
-
-    "&apiKey=" +
-    encodeURIComponent(
-      GEOAPIFY_KEY
-    );
-
-
-  const response =
-    await fetch(url);
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      "Geoapify HTTP " +
-      response.status
-    );
-
-  }
-
-
-  const data =
-    await response.json();
-
-
-  if (
-    !data.results ||
-    !data.results.length
-  ) {
-
-    throw new Error(
-      "Geoapify не нашёл этот адрес."
-    );
-
-  }
-
-
-  const result =
-    data.results[0];
-
-
-  const lat =
-    safeCoordinate(
-      result.lat
-    );
-
-
-  const lon =
-    safeCoordinate(
-      result.lon
-    );
-
-
-  if (
-    !validCoordinates(
-      lat,
-      lon
-    )
-  ) {
-
-    throw new Error(
-      "Geoapify вернул некорректные координаты."
-    );
-
-  }
-
-
-  return {
-
-    lat,
-
-    lon,
-
-    formatted:
-      result.formatted ||
-      address
-
-  };
-
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
-async function findNearest() {
-
-  const input =
-    document
-      .getElementById("address")
-      .value
-      .trim();
-
-
-  if (!input) {
-
-    alert(
-      "Введите адрес."
-    );
-
-    return;
-
-  }
-
-
-  if (!stores.length) {
-
-    alert(
-      "База магазинов ещё не загружена."
-    );
-
-    return;
-
-  }
-
-
-  const button =
-    document.getElementById(
-      "searchBtn"
-    );
-
-
-  button.disabled = true;
-
-
-  setStatus(
-    "Определяем координаты адреса..."
-  );
-
-
-  try {
-
-    const user =
-      await geocodeAddress(
-        input
-      );
-
-
-    let nearest =
-      null;
-
-
-    let min =
-      Infinity;
-
-
-    stores.forEach(
-      store => {
-
-        const distance =
-          distanceKm(
-
-            user.lat,
-            user.lon,
-
-            store.lat,
-            store.lon
-
-          );
-
-
-        if (
-          distance <
-          min
-        ) {
-
-          min =
-            distance;
-
-          nearest =
-            store;
-
-        }
+        throw new Error(
+          "Ближайший магазин не найден."
+        );
 
       }
-    );
 
 
-    if (!nearest) {
+      const store =
+        data.store;
 
-      throw new Error(
-        "Ближайший магазин не найден."
+
+      city.textContent =
+        store.city || "—";
+
+
+      storeAddress.textContent =
+        store.address || "—";
+
+
+      category.className =
+        "category " +
+        categoryClass(store.category);
+
+
+      category.textContent =
+        categoryText(store.category);
+
+
+      distance.textContent =
+        `${Number(store.distanceKm).toFixed(1)} км`;
+
+
+      result.style.display =
+        "block";
+
+
+      status.textContent =
+        "Магазин найден.";
+
+
+      showMap(
+
+        data.user,
+
+        store
+
       );
 
     }
 
+    catch (error) {
 
-    showResult(
-      nearest,
-      min
-    );
+      console.error(error);
+
+      status.className =
+        "status error";
+
+      status.textContent =
+        error.message ||
+        "Произошла ошибка.";
+
+    }
+
+    finally {
+
+      searchButton.disabled =
+        false;
+
+    }
+
+  }
 
 
-    showUserMarker(
-      user.lat,
-      user.lon
-    );
+  function showMap(user, store) {
+
+    if (!user || !store) {
+      return;
+    }
 
 
-    /*
-       Показываем пользователя
-       и ближайший магазин.
-    */
+    const userLat =
+      Number(user.lat);
+
+    const userLon =
+      Number(user.lon);
+
+    const storeLat =
+      Number(store.lat);
+
+    const storeLon =
+      Number(store.lon);
+
+
+    if (
+      !Number.isFinite(userLat) ||
+      !Number.isFinite(userLon) ||
+      !Number.isFinite(storeLat) ||
+      !Number.isFinite(storeLon)
+    ) {
+
+      return;
+
+    }
+
+
+    if (!map) {
+
+      map = L.map("map");
+
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution:
+            "&copy; OpenStreetMap contributors"
+        }
+      ).addTo(map);
+
+    }
+
+
+    if (userMarker) {
+      map.removeLayer(userMarker);
+    }
+
+    if (storeMarker) {
+      map.removeLayer(storeMarker);
+    }
+
+
+    userMarker =
+      L.marker([userLat, userLon])
+        .addTo(map)
+        .bindPopup("Ваш адрес");
+
+
+    const storeColor =
+      String(store.category || "")
+        .trim()
+        .toUpperCase();
+
+
+    const iconColors = {
+
+      A: "#2e9d4d",
+      B: "#e5bd21",
+      C: "#d73737",
+      D: "#3488d0"
+
+    };
+
+
+    const color =
+      iconColors[storeColor] ||
+      "#111";
+
+
+    const storeIcon =
+      L.divIcon({
+
+        className: "",
+
+        html: `
+          <div style="
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: ${color};
+            border: 3px solid white;
+            box-shadow: 0 2px 7px rgba(0,0,0,.35);
+          "></div>
+        `,
+
+        iconSize: [22, 22],
+
+        iconAnchor: [11, 11]
+
+      });
+
+
+    storeMarker =
+      L.marker(
+        [storeLat, storeLon],
+        { icon: storeIcon }
+      )
+      .addTo(map)
+      .bindPopup(
+        `<b>${escapeHtml(store.city || "")}</b><br>
+         ${escapeHtml(store.address || "")}`
+      );
+
 
     const bounds =
       L.latLngBounds([
 
-        [
-          user.lat,
-          user.lon
-        ],
+        [userLat, userLon],
 
-        [
-          nearest.lat,
-          nearest.lon
-        ]
+        [storeLat, storeLon]
 
       ]);
 
@@ -1912,213 +675,42 @@ async function findNearest() {
     map.fitBounds(
       bounds,
       {
-        padding: [50, 50]
+        padding: [40, 40],
+        maxZoom: 15
       }
     );
 
-
-    userMarker
-      .bindPopup(
-
-        `
-          <strong>
-            Ваш адрес
-          </strong>
-
-          <br>
-
-          ${escapeHtml(
-            user.formatted
-          )}
-
-        `
-
-      )
-      .openPopup();
+  }
 
 
-    setStatus(
-      "Адрес найден.",
-      "success"
-    );
+  function escapeHtml(value) {
 
-  } catch (error) {
+    return String(value)
 
-    console.error(error);
+      .replaceAll("&", "&amp;")
 
+      .replaceAll("<", "&lt;")
 
-    setStatus(
-      "Ошибка: " +
-      error.message,
-      "error"
-    );
+      .replaceAll(">", "&gt;")
 
-  } finally {
+      .replaceAll('"', "&quot;")
 
-    button.disabled =
-      false;
+      .replaceAll("'", "&#039;");
 
   }
 
-}
 
-
-/* =========================================================
-   MAP
-   ========================================================= */
-
-function initializeMap() {
-
-  map =
-    L.map(
-      "map"
-    ).setView(
-
-      [
-        55.7558,
-        37.6173
-      ],
-
-      5
-
-    );
-
-
-  L.tileLayer(
-
-    "https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png" +
-
-    "?apiKey=" +
-    encodeURIComponent(
-      GEOAPIFY_KEY
-    ),
-
-    {
-
-      maxZoom: 20,
-
-      attribution:
-        'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
-
-    }
-
-  ).addTo(map);
-
-}
-
-
-/* =========================================================
-   FILTERS
-   ========================================================= */
-
-document
-  .querySelectorAll(
-    ".filter-btn"
-  )
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        function() {
-
-          document
-            .querySelectorAll(
-              ".filter-btn"
-            )
-            .forEach(
-              btn =>
-                btn.classList.remove(
-                  "active"
-                )
-            );
-
-
-          this.classList.add(
-            "active"
-          );
-
-
-          currentFilter =
-            this.dataset.category;
-
-
-          drawStoreMarkers();
-
-
-          /*
-             После фильтра
-             подстраиваем карту
-             под видимые точки.
-          */
-
-          const visible =
-            stores.filter(
-              store =>
-
-                currentFilter ===
-                "ALL" ||
-
-                store.category ===
-                currentFilter
-
-            );
-
-
-          if (visible.length) {
-
-            map.fitBounds(
-
-              L.latLngBounds(
-                visible.map(
-                  store => [
-                    store.lat,
-                    store.lon
-                  ]
-                )
-              ),
-
-              {
-                padding: [30, 30]
-              }
-
-            );
-
-          }
-
-        }
-      );
-
-    }
-  );
-
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
-document
-  .getElementById(
-    "searchBtn"
-  )
-  .addEventListener(
+  searchButton.addEventListener(
     "click",
     findNearest
   );
 
 
-document
-  .getElementById(
-    "address"
-  )
-  .addEventListener(
+  addressInput.addEventListener(
     "keydown",
     event => {
 
-      if (
-        event.key ===
-        "Enter"
-      ) {
+      if (event.key === "Enter") {
 
         findNearest();
 
@@ -2126,16 +718,6 @@ document
 
     }
   );
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
-initializeMap();
-
-loadStores();
-
 
 </script>
 

@@ -134,6 +134,31 @@
       line-height: 1.5;
       margin-top: 12px;
     }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .result-table th,
+    .result-table td {
+      border-bottom: 1px solid #ddd;
+      padding: 9px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .result-table th {
+      font-weight: 600;
+      background: #f5f5f5;
+    }
+
+    .coordinates {
+      font-family: monospace;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
@@ -184,6 +209,10 @@
       Проверить статус
     </button>
 
+    <button id="checkNewFileButton">
+      Проверить результат
+    </button>
+
     <div id="batchMessage" class="status">
       Batch ещё не запускался.
     </div>
@@ -221,6 +250,9 @@ const startButton =
 
 const checkBatchButton =
   document.getElementById("checkBatchButton");
+
+const checkNewFileButton =
+  document.getElementById("checkNewFileButton");
 
 const statusMessage =
   document.getElementById("statusMessage");
@@ -436,7 +468,7 @@ async function startBatch() {
       <br><br>
 
       Статус:
-      ${data.status || "pending"}
+      ${escapeHtml(data.status || "pending")}
 
       <br><br>
 
@@ -508,6 +540,159 @@ async function checkBatch() {
   } finally {
 
     checkBatchButton.disabled = false;
+
+  }
+
+}
+
+
+async function checkNewFile() {
+
+  checkNewFileButton.disabled = true;
+
+  batchMessage.className =
+    "status";
+
+  batchMessage.textContent =
+    "Проверяю stores.new.json…";
+
+
+  try {
+
+    const data =
+      await callApi("check_new_file");
+
+
+    let html = `
+
+      <strong>Результат проверки</strong>
+
+      <br><br>
+
+      <strong>Файл:</strong>
+      ${escapeHtml(data.file || "stores.new.json")}
+
+      <br><br>
+
+      <strong>Всего адресов:</strong>
+      ${formatNumber(data.total)}
+
+      <br><br>
+
+      <strong>С координатами:</strong>
+      ${formatNumber(data.geocoded)}
+
+      <br><br>
+
+      <strong>Без координат:</strong>
+      ${formatNumber(data.withoutCoordinates)}
+
+    `;
+
+
+    if (Array.isArray(data.sample) && data.sample.length) {
+
+      html += `
+
+        <br><br>
+
+        <strong>Первые 5 адресов:</strong>
+
+        <table class="result-table">
+
+          <thead>
+
+            <tr>
+              <th>Город</th>
+              <th>Адрес</th>
+              <th>Координаты</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+      `;
+
+
+      for (const item of data.sample) {
+
+        const coordinates =
+          item.lat !== null &&
+          item.lat !== undefined &&
+          item.lon !== null &&
+          item.lon !== undefined
+
+            ? `${escapeHtml(String(item.lat))}<br>${escapeHtml(String(item.lon))}`
+
+            : "—";
+
+
+        html += `
+
+          <tr>
+
+            <td>
+              ${escapeHtml(item.city || "—")}
+            </td>
+
+            <td>
+              ${escapeHtml(item.address || "—")}
+            </td>
+
+            <td class="coordinates">
+              ${coordinates}
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+
+
+      html += `
+
+          </tbody>
+
+        </table>
+
+        <br>
+
+        Проверка выполнена.
+        Исходный stores.json не изменён.
+
+      `;
+
+    } else {
+
+      html += `
+
+        <br><br>
+
+        В файле не найдено адресов для отображения.
+
+      `;
+
+    }
+
+
+    batchMessage.className =
+      "status success";
+
+    batchMessage.innerHTML =
+      html;
+
+
+  } catch (error) {
+
+    showError(
+      batchMessage,
+      error
+    );
+
+  } finally {
+
+    checkNewFileButton.disabled = false;
 
   }
 
@@ -665,6 +850,12 @@ startButton.addEventListener(
 checkBatchButton.addEventListener(
   "click",
   checkBatch
+);
+
+
+checkNewFileButton.addEventListener(
+  "click",
+  checkNewFile
 );
 
 </script>

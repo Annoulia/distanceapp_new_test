@@ -249,6 +249,7 @@
     </label>
 
     <div class="input-row">
+
       <input
         id="address"
         type="text"
@@ -259,6 +260,7 @@
       <button id="searchButton">
         Найти ближайший
       </button>
+
     </div>
 
     <div id="status" class="status"></div>
@@ -395,7 +397,9 @@
       categoryDescriptions[letter] || "";
 
     if (description) {
+
       return `Категория ${letter} — ${description}`;
+
     }
 
     return `Категория ${letter}`;
@@ -408,6 +412,7 @@
     const address =
       addressInput.value.trim();
 
+
     if (!address) {
 
       status.textContent =
@@ -419,6 +424,7 @@
       addressInput.focus();
 
       return;
+
     }
 
 
@@ -498,8 +504,14 @@
         categoryText(store.category);
 
 
+      const distanceValue =
+        Number(store.distanceKm);
+
+
       distance.textContent =
-        `${Number(store.distanceKm).toFixed(1)} км`;
+        Number.isFinite(distanceValue)
+          ? `${distanceValue.toFixed(1)} км`
+          : "—";
 
 
       result.style.display =
@@ -511,11 +523,8 @@
 
 
       showMap(
-
         data.user,
-
         store
-
       );
 
     }
@@ -550,6 +559,29 @@
     }
 
 
+    /*
+      ВАЖНО:
+
+      Leaflet принимает координаты
+      строго в формате:
+
+      [latitude, longitude]
+
+      То есть:
+
+      [широта, долгота]
+
+      Geoapify и S3 хранят их
+      отдельно как:
+
+      lat
+      lon
+
+      Поэтому здесь НИКОГДА
+      не меняем их местами.
+    */
+
+
     const userLat =
       Number(user.lat);
 
@@ -569,6 +601,42 @@
       !Number.isFinite(storeLat) ||
       !Number.isFinite(storeLon)
     ) {
+
+      console.error(
+        "Некорректные координаты:",
+        {
+          userLat,
+          userLon,
+          storeLat,
+          storeLon
+        }
+      );
+
+      return;
+
+    }
+
+
+    /*
+      Проверяем диапазон координат.
+      Latitude: -90 ... 90
+      Longitude: -180 ... 180
+    */
+
+    if (
+      userLat < -90 ||
+      userLat > 90 ||
+      userLon < -180 ||
+      userLon > 180 ||
+      storeLat < -90 ||
+      storeLat > 90 ||
+      storeLon < -180 ||
+      storeLon > 180
+    ) {
+
+      console.error(
+        "Координаты вне допустимого диапазона."
+      );
 
       return;
 
@@ -592,21 +660,41 @@
 
 
     if (userMarker) {
+
       map.removeLayer(userMarker);
+
+      userMarker = null;
+
     }
+
 
     if (storeMarker) {
+
       map.removeLayer(storeMarker);
+
+      storeMarker = null;
+
     }
 
 
+    /*
+      ТОЧКА ПОЛЬЗОВАТЕЛЯ
+
+      [LAT, LON]
+    */
+
     userMarker =
-      L.marker([userLat, userLon])
-        .addTo(map)
-        .bindPopup("Ваш адрес");
+      L.marker([
+        userLat,
+        userLon
+      ])
+      .addTo(map)
+      .bindPopup(
+        "<b>Ваш адрес</b>"
+      );
 
 
-    const storeColor =
+    const storeCategory =
       String(store.category || "")
         .trim()
         .toUpperCase();
@@ -615,15 +703,18 @@
     const iconColors = {
 
       A: "#2e9d4d",
+
       B: "#e5bd21",
+
       C: "#d73737",
+
       D: "#3488d0"
 
     };
 
 
     const color =
-      iconColors[storeColor] ||
+      iconColors[storeCategory] ||
       "#111";
 
 
@@ -650,10 +741,23 @@
       });
 
 
+    /*
+      ТОЧКА МАГАЗИНА
+
+      [LAT, LON]
+
+      НЕ [LON, LAT]
+    */
+
     storeMarker =
       L.marker(
-        [storeLat, storeLon],
-        { icon: storeIcon }
+        [
+          storeLat,
+          storeLon
+        ],
+        {
+          icon: storeIcon
+        }
       )
       .addTo(map)
       .bindPopup(
@@ -662,12 +766,23 @@
       );
 
 
+    /*
+      Показываем на карте
+      и пользователя, и магазин.
+    */
+
     const bounds =
       L.latLngBounds([
 
-        [userLat, userLon],
+        [
+          userLat,
+          userLon
+        ],
 
-        [storeLat, storeLon]
+        [
+          storeLat,
+          storeLon
+        ]
 
       ]);
 
@@ -680,6 +795,21 @@
       }
     );
 
+
+    /*
+      После показа карты Leaflet иногда
+      требуется пересчитать размеры,
+      особенно на мобильном.
+    */
+
+    setTimeout(() => {
+
+      if (map) {
+        map.invalidateSize();
+      }
+
+    }, 100);
+
   }
 
 
@@ -687,15 +817,30 @@
 
     return String(value)
 
-      .replaceAll("&", "&amp;")
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
 
-      .replaceAll("<", "&lt;")
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
 
-      .replaceAll(">", "&gt;")
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
 
-      .replaceAll('"', "&quot;")
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
 
-      .replaceAll("'", "&#039;");
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
 
   }
 

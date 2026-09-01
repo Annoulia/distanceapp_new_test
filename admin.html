@@ -1,1312 +1,393 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Админ — Адреса клиентов</title>
-
+  <title>DistanceApp — Администратор</title>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
 
-
-    :root {
-      --green: #159447;
-      --yellow: #e2a900;
-      --red: #d83a3a;
-      --blue: #2777d4;
-      --black: #111;
-      --gray: #666;
-      --bg: #f5f6f7;
-      --card: #fff;
-    }
-
-
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--black);
-
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
     }
 
-
-    .app {
+    .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 600px;
       margin: 0 auto;
-      padding: 20px;
     }
-
 
     h1 {
-      margin: 5px 0 6px;
-      font-size: 28px;
+      margin: 0 0 8px;
+      font-size: 26px;
     }
-
 
     .subtitle {
-      color: var(--gray);
-      margin-bottom: 20px;
-      font-size: 14px;
-      line-height: 1.45;
+      color: #666;
+      margin-bottom: 24px;
     }
 
-
     .card {
-      background: var(--card);
+      background: white;
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 16px;
-
-      box-shadow:
-        0 2px 12px rgba(0,0,0,.06);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
-
-    .title {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-
-
-    .drop {
-      border: 2px dashed #bbb;
-      border-radius: 14px;
-      padding: 30px 18px;
-      text-align: center;
-      background: #fafafa;
-    }
-
-
-    .drop.drag {
-      border-color: var(--blue);
-      background: #f1f7ff;
-    }
-
-
-    .drop strong {
+    label {
       display: block;
-      font-size: 17px;
+      font-weight: 600;
       margin-bottom: 8px;
     }
 
-
-    .drop span {
-      display: block;
-      color: var(--gray);
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-
-    input[type="file"] {
+    input {
       width: 100%;
-      max-width: 400px;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 12px;
     }
-
 
     button {
       width: 100%;
+      padding: 15px;
       border: 0;
-      border-radius: 11px;
-      padding: 14px;
-
-      background: var(--black);
+      border-radius: 10px;
+      background: #111;
       color: white;
-
       font-size: 16px;
-      font-weight: 800;
-
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
     }
-
 
     button:disabled {
-      opacity: .45;
-      cursor: default;
+      opacity: 0.5;
+      cursor: wait;
     }
-
-
-    .status {
-      padding: 14px;
-      border-radius: 11px;
-
-      background: #f0f0f0;
-      color: #555;
-
-      font-size: 14px;
-      line-height: 1.5;
-
-      white-space: pre-line;
-    }
-
-
-    .status.success {
-      background: #e9f7ee;
-      color: #176b35;
-    }
-
-
-    .status.error {
-      background: #fdecec;
-      color: #9e2020;
-    }
-
-
-    .progress-wrap {
-      display: none;
-      margin-top: 15px;
-    }
-
-
-    .progress {
-      height: 12px;
-      background: #e5e5e5;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-
-    .progress-bar {
-      width: 0%;
-      height: 100%;
-
-      background: var(--blue);
-
-      transition:
-        width .4s ease;
-    }
-
-
-    .progress-text {
-      margin-top: 8px;
-      color: var(--gray);
-      font-size: 13px;
-    }
-
 
     .stats {
-      display: none;
-
-      grid-template-columns:
-        repeat(3, 1fr);
-
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 15px;
-    }
-
-
-    .stat {
-      background: #f3f3f3;
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-    }
-
-
-    .stat-number {
-      font-size: 25px;
-      font-weight: 800;
-    }
-
-
-    .stat-label {
-      margin-top: 3px;
-      color: var(--gray);
-      font-size: 12px;
-    }
-
-
-    .info {
-      margin: 0;
-      padding-left: 22px;
-
-      line-height: 1.8;
-      font-size: 14px;
-    }
-
-
-    .warning {
-      padding: 12px;
-      border-radius: 10px;
-
-      background: #fff5d6;
-      color: #765600;
-
-      font-size: 13px;
-      line-height: 1.5;
-
       margin-top: 12px;
     }
 
-
-    .required {
-      font-weight: 800;
+    .stat {
+      background: #f5f5f5;
+      border-radius: 10px;
+      padding: 14px;
     }
 
-
-    @media (max-width: 600px) {
-
-      .app {
-        padding: 10px;
-      }
-
-
-      h1 {
-        font-size: 23px;
-      }
-
-
-      .card {
-        padding: 15px;
-      }
-
-
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
     }
 
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+    }
+
+    #status {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      background: #f5f5f5;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+
+    .warning {
+      color: #8a5700;
+      background: #fff5d6 !important;
+    }
+
+    .success {
+      color: #176b32;
+      background: #e9f8ed !important;
+    }
+
+    .error {
+      color: #a40000;
+      background: #ffeaea !important;
+    }
+
+    .small {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #777;
+      line-height: 1.4;
+    }
   </style>
-
 </head>
-
 
 <body>
 
+<div class="container">
 
-<div class="app">
-
-
-  <h1>
-    Админ — Адреса клиентов
-  </h1>
-
+  <h1>Администратор DistanceApp</h1>
 
   <div class="subtitle">
-
-    Тестовая загрузка базы магазинов.
-    Рабочий сайт не используется.
-
+    Тестовая база адресов
   </div>
-
-
-  <!-- =====================================================
-       UPLOAD
-       ===================================================== -->
 
   <div class="card">
 
+    <label for="adminKey">
+      ADMIN KEY
+    </label>
 
-    <div class="title">
-      Загрузить новый Excel
-    </div>
-
-
-    <div
-      id="drop"
-      class="drop"
+    <input
+      id="adminKey"
+      type="password"
+      placeholder="Введите ADMIN_KEY"
+      autocomplete="off"
     >
 
-      <strong>
-        Выберите Excel-файл
-      </strong>
-
-
-      <span>
-        Формат .xlsx или .xls
-      </span>
-
-
-      <input
-        id="file"
-        type="file"
-        accept=".xlsx,.xls"
-      >
-
-    </div>
-
-
-    <button
-      id="uploadBtn"
-      disabled
-    >
-      Загрузить базу
+    <button id="checkButton">
+      Проверить базу
     </button>
 
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-number" id="total">—</div>
+        <div class="stat-label">Всего адресов</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-number" id="geocoded">—</div>
+        <div class="stat-label">С координатами</div>
+      </div>
+    </div>
+
   </div>
-
-
-  <!-- =====================================================
-       STATUS
-       ===================================================== -->
 
   <div class="card">
 
+    <button id="geocodeButton">
+      Обновить координаты
+    </button>
 
-    <div class="title">
-      Статус
+    <div class="small">
+      Будут обработаны все адреса из текущего stores.json.
+      Старый stores.json не будет заменён до завершения обработки.
     </div>
 
-
-    <div
-      id="status"
-      class="status"
-    >
-      Выберите Excel-файл.
+    <div id="status">
+      Готово к работе.
     </div>
-
-
-    <div
-      id="progressWrap"
-      class="progress-wrap"
-    >
-
-      <div class="progress">
-
-        <div
-          id="progressBar"
-          class="progress-bar"
-        ></div>
-
-      </div>
-
-
-      <div
-        id="progressText"
-        class="progress-text"
-      >
-        Подготовка...
-      </div>
-
-    </div>
-
-
-    <div
-      id="stats"
-      class="stats"
-    >
-
-      <div class="stat">
-
-        <div
-          id="total"
-          class="stat-number"
-        >
-          0
-        </div>
-
-        <div class="stat-label">
-          Всего адресов
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div
-          id="geocoded"
-          class="stat-number"
-        >
-          0
-        </div>
-
-        <div class="stat-label">
-          Координаты получены
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div
-          id="errors"
-          class="stat-number"
-        >
-          0
-        </div>
-
-        <div class="stat-label">
-          Не найдено
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- =====================================================
-       EXCEL REQUIREMENTS
-       ===================================================== -->
-
- <div class="card">
-
-  <div class="title">
-    Требования к Excel
-  </div>
-
-  <ol class="info">
-
-    <li>
-      Категория
-    </li>
-
-    <li>
-      Область / край
-    </li>
-
-    <li>
-      Город
-    </li>
-
-    <li>
-      Адрес магазина
-    </li>
-
-    <li>
-      Контрагент — необязательно
-    </li>
-
-  </ol>
-
-
-  <div class="warning">
-
-    Категории A, B, C и D поддерживаются.
-    После загрузки новая база заменяет
-    предыдущую тестовую базу.
-
-    <br><br>
-
-    <strong>
-      Важно:
-    </strong>
-
-    область / край используется
-    при определении координат адреса,
-    поэтому этот столбец должен быть
-    заполнен для каждого магазина.
 
   </div>
 
 </div>
-
-
-
-    <div class="warning">
-
-      Категории A, B, C и D поддерживаются.
-
-      После загрузки новая база полностью
-      заменяет предыдущую тестовую базу.
-
-    </div>
-
-  </div>
-
-
-</div>
-
 
 <script>
-
-
-/* =========================================================
-   API
-   ========================================================= */
-
 
 const API_URL =
   "https://fn.tatnet.cloud/d81fff77-caeb-4e02-b374-407e2b3486f0/f55c92b9-2fb7-44a3-a0b7-0c7bc16ff784";
 
+const adminKeyInput =
+  document.getElementById("adminKey");
 
-/* =========================================================
-   ELEMENTS
-   ========================================================= */
+const checkButton =
+  document.getElementById("checkButton");
 
+const geocodeButton =
+  document.getElementById("geocodeButton");
 
-const fileInput =
-  document.getElementById(
-    "file"
-  );
+const statusBox =
+  document.getElementById("status");
 
+const totalElement =
+  document.getElementById("total");
 
-const uploadBtn =
-  document.getElementById(
-    "uploadBtn"
-  );
-
-
-const status =
-  document.getElementById(
-    "status"
-  );
+const geocodedElement =
+  document.getElementById("geocoded");
 
 
-const drop =
-  document.getElementById(
-    "drop"
-  );
-
-
-const progressWrap =
-  document.getElementById(
-    "progressWrap"
-  );
-
-
-const progressBar =
-  document.getElementById(
-    "progressBar"
-  );
-
-
-const progressText =
-  document.getElementById(
-    "progressText"
-  );
-
-
-const stats =
-  document.getElementById(
-    "stats"
-  );
-
-
-let selectedFile =
-  null;
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-
-function setStatus(
-  message,
-  type = ""
-) {
-
-  status.textContent =
-    message;
-
-  status.className =
-    "status " +
-    type;
-
+function getAdminKey() {
+  return adminKeyInput.value.trim();
 }
 
 
-/* =========================================================
-   FILE SELECT
-   ========================================================= */
+function setStatus(message, type = "") {
+  statusBox.textContent = message;
 
+  statusBox.className = "";
 
-fileInput.addEventListener(
-  "change",
-  function() {
-
-    selectedFile =
-      this.files?.[0] ||
-      null;
-
-    updateFileState();
-
+  if (type) {
+    statusBox.classList.add(type);
   }
-);
+}
 
 
-/* =========================================================
-   DRAG & DROP
-   ========================================================= */
+async function checkDatabase() {
 
+  setStatus("Проверяем базу…");
 
-drop.addEventListener(
-  "dragover",
-  function(event) {
+  checkButton.disabled = true;
 
-    event.preventDefault();
+  try {
 
-    drop.classList.add(
-      "drag"
-    );
+    const response =
+      await fetch(API_URL);
 
-  }
-);
+    const data =
+      await response.json();
 
-
-drop.addEventListener(
-  "dragleave",
-  function() {
-
-    drop.classList.remove(
-      "drag"
-    );
-
-  }
-);
-
-
-drop.addEventListener(
-  "drop",
-  function(event) {
-
-    event.preventDefault();
-
-    drop.classList.remove(
-      "drag"
-    );
-
-
-    selectedFile =
-      event.dataTransfer.files?.[0] ||
-      null;
-
-
-    if (selectedFile) {
-
-      try {
-
-        fileInput.files =
-          event.dataTransfer.files;
-
-      } catch {}
-
+    if (!response.ok || !data.ok) {
+      throw new Error(
+        data.error || "Ошибка проверки базы"
+      );
     }
 
+    totalElement.textContent =
+      data.total ?? "—";
 
-    updateFileState();
-
-  }
-);
-
-
-/* =========================================================
-   UPDATE FILE STATE
-   ========================================================= */
-
-
-function updateFileState() {
-
-  if (!selectedFile) {
-
-    uploadBtn.disabled =
-      true;
+    geocodedElement.textContent =
+      data.geocoded ?? "—";
 
     setStatus(
-      "Выберите Excel-файл."
+      "База успешно прочитана.\n" +
+      "Адресов: " + data.total + "\n" +
+      "С координатами: " + data.geocoded,
+      "success"
     );
 
-    return;
-
-  }
-
-
-  const name =
-    selectedFile.name.toLowerCase();
-
-
-  if (
-    !name.endsWith(".xlsx") &&
-    !name.endsWith(".xls")
-  ) {
-
-    uploadBtn.disabled =
-      true;
+  } catch (error) {
 
     setStatus(
-      "Нужен файл Excel (.xlsx или .xls).",
+      "Ошибка:\n" +
+      (error.message || error),
       "error"
     );
 
-    return;
+  } finally {
+
+    checkButton.disabled = false;
 
   }
+}
 
 
-  uploadBtn.disabled =
-    false;
+async function geocodeAll() {
 
+  const adminKey =
+    getAdminKey();
+
+  if (!adminKey) {
+
+    setStatus(
+      "Сначала введи ADMIN_KEY.",
+      "warning"
+    );
+
+    adminKeyInput.focus();
+
+    return;
+  }
+
+  const confirmed =
+    confirm(
+      "Сейчас будут обработаны все адреса из тестовой базы.\n\n" +
+      "Продолжить?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  geocodeButton.disabled = true;
+  checkButton.disabled = true;
 
   setStatus(
-
-    "Файл выбран: " +
-    selectedFile.name +
-    "\nРазмер: " +
-    formatBytes(
-      selectedFile.size
-    )
-
+    "Запущено геокодирование 230 адресов.\n\n" +
+    "Пожалуйста, не закрывай эту страницу.",
+    "warning"
   );
 
-}
+  try {
 
+    const response =
+      await fetch(API_URL, {
 
-/* =========================================================
-   FILE → BASE64
-   ========================================================= */
-
-
-function fileToBase64(
-  file
-) {
-
-  return new Promise(
-    (
-      resolve,
-      reject
-    ) => {
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function() {
-
-          const result =
-            String(
-              reader.result || ""
-            );
-
-
-          const comma =
-            result.indexOf(",");
-
-
-          if (
-            comma === -1
-          ) {
-
-            reject(
-              new Error(
-                "Не удалось прочитать файл."
-              )
-            );
-
-            return;
-
-          }
-
-
-          resolve(
-            result.slice(
-              comma + 1
-            )
-          );
-
-        };
-
-
-      reader.onerror =
-        function() {
-
-          reject(
-            new Error(
-              "Ошибка чтения файла."
-            )
-          );
-
-        };
-
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   API
-   ========================================================= */
-
-
-async function api(
-  payload
-) {
-
-  const response =
-    await fetch(
-      API_URL,
-      {
-
-        method:
-          "POST",
+        method: "POST",
 
         headers: {
-
-          "Content-Type":
-            "application/json"
-
+          "Content-Type": "application/json",
+          "X-Admin-Key": adminKey
         },
 
-        body:
-          JSON.stringify(
-            payload
-          )
-
-      }
-    );
-
-
-  const text =
-    await response.text();
-
-
-  let data;
-
-
-  try {
-
-    data =
-      JSON.parse(
-        text
-      );
-
-  } catch {
-
-    throw new Error(
-
-      "Сервер вернул некорректный ответ:\n" +
-      text
-
-    );
-
-  }
-
-
-  if (!response.ok) {
-
-    throw new Error(
-
-      data.error ||
-      "HTTP " +
-      response.status
-
-    );
-
-  }
-
-
-  if (
-    data.ok === false
-  ) {
-
-    throw new Error(
-
-      data.error ||
-      "Ошибка сервера."
-
-    );
-
-  }
-
-
-  return data;
-
-}
-
-
-/* =========================================================
-   UPLOAD
-   ========================================================= */
-
-
-uploadBtn.addEventListener(
-  "click",
-  upload
-);
-
-
-async function upload() {
-
-  if (!selectedFile) {
-
-    return;
-
-  }
-
-
-  uploadBtn.disabled =
-    true;
-
-
-  progressWrap.style.display =
-    "block";
-
-
-  stats.style.display =
-    "none";
-
-
-  progressBar.style.width =
-    "5%";
-
-
-  progressText.textContent =
-    "Читаем Excel...";
-
-
-  setStatus(
-    "Подготавливаем загрузку..."
-  );
-
-
-  try {
-
-
-    const base64 =
-      await fileToBase64(
-        selectedFile
-      );
-
-
-    progressBar.style.width =
-      "20%";
-
-
-    progressText.textContent =
-      "Отправляем Excel на сервер...";
-
-
-    const uploaded =
-      await api({
-
-        action:
-          "upload",
-
-        filename:
-          selectedFile.name,
-
-        file:
-          base64
+        body: JSON.stringify({
+          action: "geocode_all"
+        })
 
       });
 
+    const data =
+      await response.json();
 
-    if (
-      uploaded.status !==
-      "geocoding"
-    ) {
+    if (!response.ok || !data.ok) {
 
       throw new Error(
-
-        "Сервер не запустил обработку адресов."
-
+        data.error ||
+        "Ошибка геокодирования"
       );
 
     }
 
-
-    progressBar.style.width =
-      "35%";
-
-
-    progressText.textContent =
-
-      "Geoapify обрабатывает " +
-      uploaded.total +
-      " адресов...";
-
-
     setStatus(
-
-      "Excel загружен.\n" +
-      "Запущено определение координат."
-
+      "Готово!\n\n" +
+      "Всего адресов: " + data.total + "\n" +
+      "Найдено координат: " + data.geocoded + "\n" +
+      "Ошибок: " + data.errors + "\n\n" +
+      "Новая база сохранена как stores.new.json.\n" +
+      "Старый stores.json пока НЕ изменён.",
+      "success"
     );
 
+    await checkDatabase();
 
-    await waitForCompletion();
-
-
-  } catch (
-    error
-  ) {
-
-    console.error(
-      error
-    );
-
+  } catch (error) {
 
     setStatus(
-
-      "Ошибка:\n" +
-      error.message,
-
+      "Ошибка:\n\n" +
+      (error.message || error) +
+      "\n\n" +
+      "Существующая база не изменялась.",
       "error"
-
     );
 
+  } finally {
 
-    progressWrap.style.display =
-      "none";
-
-
-    uploadBtn.disabled =
-      false;
+    geocodeButton.disabled = false;
+    checkButton.disabled = false;
 
   }
-
 }
 
 
-/* =========================================================
-   WAIT FOR GEOCODING
-   ========================================================= */
-
-
-async function waitForCompletion() {
-
-  const started =
-    Date.now();
-
-
-  const timeout =
-    10 * 60 * 1000;
-
-
-  while (
-    Date.now() -
-    started <
-    timeout
-  ) {
-
-
-    await sleep(
-      4000
-    );
-
-
-    let data;
-
-
-    try {
-
-      data =
-        await api({
-
-          action:
-            "status"
-
-        });
-
-    } catch (
-      error
-    ) {
-
-      console.warn(
-        error
-      );
-
-      continue;
-
-    }
-
-
-    if (
-      data.status ===
-      "processing"
-    ) {
-
-      progressBar.style.width =
-        "65%";
-
-
-      progressText.textContent =
-
-        "Geoapify ещё обрабатывает адреса...";
-
-
-      setStatus(
-
-        "Обработка продолжается.\n" +
-        "Пожалуйста, не закрывайте страницу."
-
-      );
-
-
-      continue;
-
-    }
-
-
-    if (
-      data.status ===
-      "completed"
-    ) {
-
-
-      progressBar.style.width =
-        "100%";
-
-
-      progressText.textContent =
-        "Готово.";
-
-
-      showStats(
-        data
-      );
-
-
-      setStatus(
-
-        "Новая база успешно загружена.\n" +
-        "Координаты адресов обновлены.",
-
-        "success"
-
-      );
-
-
-      uploadBtn.disabled =
-        false;
-
-
-      return;
-
-    }
-
-  }
-
-
-  throw new Error(
-
-    "Время ожидания истекло. Проверь статус функции TatNet."
-
-  );
-
-}
-
-
-/* =========================================================
-   STATS
-   ========================================================= */
-
-
-function showStats(
-  data
-) {
-
-  document.getElementById(
-    "total"
-  ).textContent =
-    data.total ??
-    0;
-
-
-  document.getElementById(
-    "geocoded"
-  ).textContent =
-    data.geocoded ??
-    0;
-
-
-  document.getElementById(
-    "errors"
-  ).textContent =
-    data.errors ??
-    0;
-
-
-  stats.style.display =
-    "grid";
-
-}
-
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
-
-
-function sleep(
-  ms
-) {
-
-  return new Promise(
-    resolve =>
-      setTimeout(
-        resolve,
-        ms
-      )
-  );
-
-}
-
-
-function formatBytes(
-  bytes
-) {
-
-  if (
-    bytes < 1024
-  ) {
-
-    return bytes +
-      " Б";
-
-  }
-
-
-  if (
-    bytes <
-    1024 * 1024
-  ) {
-
-    return (
-
-      bytes /
-      1024
-
-    ).toFixed(1) +
-      " КБ";
-
-  }
-
-
-  return (
-
-    bytes /
-    1024 /
-    1024
-
-  ).toFixed(1) +
-    " МБ";
-
-}
-
+checkButton.addEventListener(
+  "click",
+  checkDatabase
+);
+
+geocodeButton.addEventListener(
+  "click",
+  geocodeAll
+);
 
 </script>
-
 
 </body>
 </html>

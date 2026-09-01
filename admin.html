@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>DistanceApp — Администратор</title>
+  <title>DistanceApp — Админка TEST</title>
 
   <style>
     * {
@@ -13,34 +13,33 @@
 
     body {
       margin: 0;
-      padding: 24px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background: #f5f5f5;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f4f5f7;
       color: #222;
     }
 
     .container {
-      width: 100%;
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: 26px;
+      margin: 0 0 6px;
+      font-size: 25px;
     }
 
     .subtitle {
-      color: #666;
+      color: #777;
       margin-bottom: 24px;
     }
 
     .card {
       background: white;
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 20px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
     }
 
     label {
@@ -53,7 +52,7 @@
       width: 100%;
       padding: 14px;
       border: 1px solid #ccc;
-      border-radius: 10px;
+      border-radius: 9px;
       font-size: 16px;
       margin-bottom: 12px;
     }
@@ -63,23 +62,47 @@
       padding: 15px;
       border: 0;
       border-radius: 10px;
-      background: #111;
-      color: white;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 8px;
+      background: #222;
+      color: white;
     }
 
     button:disabled {
-      opacity: 0.5;
-      cursor: wait;
+      opacity: .5;
+      cursor: default;
+    }
+
+    .status {
+      padding: 14px;
+      border-radius: 10px;
+      background: #f0f1f3;
+      margin-top: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .success {
+      background: #e9f7ed;
+    }
+
+    .error {
+      background: #fdecec;
+      color: #a00000;
+    }
+
+    .warning {
+      background: #fff7df;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 15px;
     }
 
     .stat {
@@ -89,60 +112,27 @@
     }
 
     .stat-number {
-      font-size: 24px;
+      font-size: 25px;
       font-weight: 700;
     }
 
     .stat-label {
-      font-size: 13px;
-      color: #666;
-    }
-
-    #status {
-      margin-top: 16px;
-      padding: 14px;
-      border-radius: 10px;
-      background: #f5f5f5;
-      white-space: pre-wrap;
-      line-height: 1.4;
-    }
-
-    .warning {
-      color: #8a5700;
-      background: #fff5d6 !important;
-    }
-
-    .success {
-      color: #176b32;
-      background: #e9f8ed !important;
-    }
-
-    .error {
-      color: #a40000;
-      background: #ffeaea !important;
-    }
-
-    .small {
-      margin-top: 10px;
-      font-size: 13px;
       color: #777;
-      line-height: 1.4;
+      font-size: 13px;
+      margin-top: 3px;
     }
 
-    .progress {
+    .job {
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .note {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
       margin-top: 12px;
-      height: 10px;
-      background: #e5e5e5;
-      border-radius: 10px;
-      overflow: hidden;
-      display: none;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: #111;
-      transition: width 0.3s ease;
     }
   </style>
 </head>
@@ -151,22 +141,17 @@
 
 <div class="container">
 
-  <h1>Администратор DistanceApp</h1>
-
-  <div class="subtitle">
-    Тестовая база адресов
-  </div>
+  <h1>DistanceApp — TEST</h1>
+  <div class="subtitle">Администрирование геокодирования</div>
 
   <div class="card">
 
-    <label for="adminKey">
-      ADMIN KEY
-    </label>
+    <label for="adminKey">ADMIN KEY</label>
 
     <input
       id="adminKey"
       type="password"
-      placeholder="Введите ADMIN_KEY"
+      placeholder="Введите ADMIN KEY"
       autocomplete="off"
     >
 
@@ -174,47 +159,56 @@
       Проверить базу
     </button>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-number" id="total">—</div>
-        <div class="stat-label">Всего адресов</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-number" id="geocoded">—</div>
-        <div class="stat-label">С координатами</div>
-      </div>
+    <div id="statusMessage" class="status">
+      Введите ADMIN KEY и нажмите «Проверить базу».
     </div>
 
   </div>
 
+
   <div class="card">
 
-    <button id="geocodeButton">
-      Обновить координаты
+    <h2>Geoapify Batch</h2>
+
+    <div class="note">
+      Эта операция запускает геокодирование существующих адресов.
+      Исходный файл stores.json не изменяется.
+      Результат будет сохранён отдельно как stores.new.json.
+    </div>
+
+    <button id="startButton">
+      Запустить геокодирование
     </button>
 
-    <div class="small">
-      Адреса обрабатываются небольшими партиями.
-      Старый stores.json не изменяется.
+    <button id="checkBatchButton">
+      Проверить статус
+    </button>
+
+    <div id="batchMessage" class="status">
+      Batch ещё не запускался.
     </div>
 
-    <div class="progress" id="progress">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
+  </div>
 
-    <div id="status">
-      Готово к работе.
+
+  <div class="card">
+
+    <h2>Информация</h2>
+
+    <div id="stats">
+      База ещё не проверена.
     </div>
 
   </div>
 
 </div>
 
+
 <script>
 
 const API_URL =
   "https://fn.tatnet.cloud/d81fff77-caeb-4e02-b374-407e2b3486f0/f55c92b9-2fb7-44a3-a0b7-0c7bc16ff784";
+
 
 const adminKeyInput =
   document.getElementById("adminKey");
@@ -222,115 +216,182 @@ const adminKeyInput =
 const checkButton =
   document.getElementById("checkButton");
 
-const geocodeButton =
-  document.getElementById("geocodeButton");
+const startButton =
+  document.getElementById("startButton");
 
-const statusBox =
-  document.getElementById("status");
+const checkBatchButton =
+  document.getElementById("checkBatchButton");
 
-const totalElement =
-  document.getElementById("total");
+const statusMessage =
+  document.getElementById("statusMessage");
 
-const geocodedElement =
-  document.getElementById("geocoded");
+const batchMessage =
+  document.getElementById("batchMessage");
 
-const progress =
-  document.getElementById("progress");
-
-const progressBar =
-  document.getElementById("progressBar");
+const stats =
+  document.getElementById("stats");
 
 
 function getAdminKey() {
+
   return adminKeyInput.value.trim();
+
 }
 
 
-function setStatus(message, type = "") {
+async function callApi(action) {
 
-  statusBox.textContent = message;
+  const adminKey = getAdminKey();
 
-  statusBox.className = "";
-
-  if (type) {
-    statusBox.classList.add(type);
+  if (!adminKey) {
+    throw new Error("Введите ADMIN KEY.");
   }
+
+
+  const response = await fetch(API_URL, {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+      action: action,
+      adminKey: adminKey
+    })
+
+  });
+
+
+  const text = await response.text();
+
+
+  let data;
+
+  try {
+
+    data = JSON.parse(text);
+
+  } catch {
+
+    throw new Error(
+      "Сервер вернул не JSON.\n\nHTTP " +
+      response.status +
+      "\n\n" +
+      text.slice(0, 1000)
+    );
+
+  }
+
+
+  if (!response.ok || data.ok === false) {
+
+    throw new Error(
+      data.error ||
+      data.message ||
+      "Ошибка HTTP " + response.status
+    );
+
+  }
+
+
+  return data;
+
 }
 
 
-function updateProgress(current, total) {
+function showError(element, error) {
 
-  if (!total) {
-    return;
+  element.className = "status error";
+
+  element.textContent =
+    error?.message ||
+    String(error);
+
+}
+
+
+function formatNumber(value) {
+
+  if (value === null || value === undefined) {
+    return "—";
   }
 
-  const percent =
-    Math.min(100, Math.round((current / total) * 100));
+  return Number(value).toLocaleString("ru-RU");
 
-  progress.style.display = "block";
-
-  progressBar.style.width =
-    percent + "%";
 }
 
 
 async function checkDatabase() {
 
-  setStatus("Проверяем базу…");
-
   checkButton.disabled = true;
 
-  try {
+  statusMessage.className = "status";
 
-    const response =
-      await fetch(API_URL);
+  statusMessage.textContent =
+    "Проверяю базу…";
+
+  try {
 
     const data =
-      await response.json();
+      await callApi("status");
 
-    if (!response.ok || !data.ok) {
 
-      throw new Error(
-        data.error || "Ошибка проверки базы"
-      );
+    statusMessage.className =
+      "status success";
+
+    statusMessage.textContent =
+      "База успешно прочитана.";
+
+
+    stats.innerHTML = `
+
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-number">
+            ${formatNumber(data.total)}
+          </div>
+          <div class="stat-label">
+            Всего адресов
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">
+            ${formatNumber(data.geocoded)}
+          </div>
+          <div class="stat-label">
+            С координатами
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-number">
+            ${formatNumber(data.remaining)}
+          </div>
+          <div class="stat-label">
+            Осталось обработать
+          </div>
+        </div>
+
+      </div>
+
+    `;
+
+
+    if (data.batch) {
+
+      renderBatch(data.batch);
 
     }
-
-    totalElement.textContent =
-      data.total ?? "—";
-
-    geocodedElement.textContent =
-      data.geocoded ?? "—";
-
-    let message =
-      "База успешно прочитана.\n" +
-      "Адресов: " + data.total + "\n" +
-      "С координатами: " + data.geocoded;
-
-    if (data.progress) {
-
-      message +=
-        "\n\nПрогресс обработки: " +
-        (data.progress.nextIndex || 0) +
-        " / " +
-        (data.progress.total || data.total);
-
-      if (data.progress.finished) {
-        message += "\nОбработка завершена.";
-      }
-    }
-
-    setStatus(
-      message,
-      "success"
-    );
 
   } catch (error) {
 
-    setStatus(
-      "Ошибка:\n" +
-      (error.message || error),
-      "error"
+    showError(
+      statusMessage,
+      error
     );
 
   } finally {
@@ -338,180 +399,254 @@ async function checkDatabase() {
     checkButton.disabled = false;
 
   }
+
 }
 
 
-async function runGeocodeStep(adminKey) {
+async function startBatch() {
 
-  const response =
-    await fetch(API_URL, {
+  startButton.disabled = true;
 
-      method: "POST",
+  batchMessage.className =
+    "status";
 
-      headers: {
-        "Content-Type": "application/json",
-        "X-Admin-Key": adminKey
-      },
+  batchMessage.textContent =
+    "Запускаю Geoapify Batch…";
 
-      body: JSON.stringify({
-        action: "geocode_all"
-      })
-
-    });
-
-  const text =
-    await response.text();
-
-  let data;
-
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error(
-      "Сервер вернул не JSON:\n" +
-      text.slice(0, 500)
-    );
-  }
-
-  if (!response.ok || !data.ok) {
-
-    throw new Error(
-      data.error ||
-      "Ошибка геокодирования"
-    );
-
-  }
-
-  return data;
-}
-
-
-async function geocodeAll() {
-
-  const adminKey =
-    getAdminKey();
-
-  if (!adminKey) {
-
-    setStatus(
-      "Сначала введи ADMIN_KEY.",
-      "warning"
-    );
-
-    adminKeyInput.focus();
-
-    return;
-  }
-
-  const confirmed =
-    confirm(
-      "Сейчас начнётся обработка 230 адресов.\n\n" +
-      "Обработка будет идти небольшими партиями.\n" +
-      "stores.json останется нетронутым.\n\n" +
-      "Продолжить?"
-    );
-
-  if (!confirmed) {
-    return;
-  }
-
-  geocodeButton.disabled = true;
-  checkButton.disabled = true;
-
-  progress.style.display = "block";
-  progressBar.style.width = "0%";
-
-  setStatus(
-    "Запускаем обработку…\n\n" +
-    "Пожалуйста, не закрывай страницу.",
-    "warning"
-  );
 
   try {
 
-    let finished = false;
-    let total = 230;
-    let current = 0;
-    let totalSuccess = 0;
-    let totalFailed = 0;
+    const data =
+      await callApi("start_batch");
 
-    while (!finished) {
 
-      const data =
-        await runGeocodeStep(adminKey);
+    batchMessage.className =
+      "status success";
 
-      total =
-        data.total || total;
 
-      current =
-        data.nextIndex || current;
+    batchMessage.innerHTML = `
 
-      totalSuccess +=
-        data.success || 0;
+      <strong>Batch запущен.</strong>
 
-      totalFailed +=
-        data.failed || 0;
+      <br><br>
 
-      updateProgress(
-        current,
-        total
-      );
+      Адресов:
+      ${formatNumber(data.total)}
 
-      setStatus(
-        "Обработка адресов…\n\n" +
-        "Готово: " + current + " / " + total + "\n" +
-        "Найдено координат: " +
-        totalSuccess + "\n" +
-        "Не найдено / ошибок: " +
-        totalFailed + "\n\n" +
-        "Старый stores.json не изменяется.",
-        "warning"
-      );
+      <br><br>
 
-      finished =
-        Boolean(data.finished);
+      Статус:
+      ${data.status || "pending"}
 
-      if (!finished) {
-        await new Promise(
-          resolve => setTimeout(resolve, 300)
-        );
-      }
-    }
+      <br><br>
 
-    updateProgress(
-      total,
-      total
-    );
+      Job ID:
 
-    setStatus(
-      "Геокодирование завершено!\n\n" +
-      "Всего адресов: " + total + "\n" +
-      "Найдено координат: " + totalSuccess + "\n" +
-      "Не найдено / ошибок: " + totalFailed + "\n\n" +
-      "Результат сохранён в stores.new.json.\n" +
-      "Старый stores.json НЕ изменён.",
-      "success"
-    );
+      <div class="job">
+        ${escapeHtml(data.jobId || "—")}
+      </div>
 
-    await checkDatabase();
+      <br>
+
+      Geoapify сейчас обрабатывает адреса.
+      Исходная база не изменена.
+
+    `;
+
 
   } catch (error) {
 
-    setStatus(
-      "Остановка обработки.\n\n" +
-      "Ошибка:\n" +
-      (error.message || error) +
-      "\n\n" +
-      "Существующая база stores.json не изменялась.",
-      "error"
+    showError(
+      batchMessage,
+      error
     );
 
   } finally {
 
-    geocodeButton.disabled = false;
-    checkButton.disabled = false;
+    startButton.disabled = false;
 
   }
+
+}
+
+
+async function checkBatch() {
+
+  checkBatchButton.disabled = true;
+
+  batchMessage.className =
+    "status";
+
+  batchMessage.textContent =
+    "Проверяю статус Batch…";
+
+
+  try {
+
+    const data =
+      await callApi("check_batch");
+
+
+    renderBatch(data);
+
+
+    if (data.finished) {
+
+      batchMessage.classList.add(
+        "success"
+      );
+
+    }
+
+  } catch (error) {
+
+    showError(
+      batchMessage,
+      error
+    );
+
+  } finally {
+
+    checkBatchButton.disabled = false;
+
+  }
+
+}
+
+
+function renderBatch(data) {
+
+  if (!data) {
+
+    batchMessage.className =
+      "status";
+
+    batchMessage.textContent =
+      "Batch ещё не запускался.";
+
+    return;
+
+  }
+
+
+  const status =
+    data.status || "—";
+
+  const total =
+    data.total ?? "—";
+
+  const found =
+    data.found ?? "—";
+
+  const notFound =
+    data.notFound ?? "—";
+
+  const received =
+    data.resultsReceived ??
+    data.resultsCount ??
+    "—";
+
+
+  let html = `
+
+    <strong>Статус Batch:</strong>
+    ${escapeHtml(String(status))}
+
+    <br><br>
+
+    <strong>Всего адресов:</strong>
+    ${formatNumber(total)}
+
+    <br><br>
+
+  `;
+
+
+  if (data.jobId) {
+
+    html += `
+
+      <strong>Job ID:</strong>
+
+      <div class="job">
+        ${escapeHtml(data.jobId)}
+      </div>
+
+      <br>
+
+    `;
+
+  }
+
+
+  if (data.finished) {
+
+    html += `
+
+      <strong>Получено результатов:</strong>
+      ${formatNumber(received)}
+
+      <br><br>
+
+      <strong>Найдено координат:</strong>
+      ${formatNumber(found)}
+
+      <br><br>
+
+      <strong>Не найдено:</strong>
+      ${formatNumber(notFound)}
+
+      <br><br>
+
+      <strong>Файл результата:</strong>
+      stores.new.json
+
+      <br><br>
+
+      Геокодирование завершено.
+      Исходный stores.json не изменён.
+
+    `;
+
+  } else {
+
+    html += `
+
+      Geoapify ещё обрабатывает адреса.
+
+      <br><br>
+
+      Нажми «Проверить статус»
+      через некоторое время.
+
+    `;
+
+  }
+
+
+  batchMessage.className =
+    "status";
+
+  batchMessage.innerHTML =
+    html;
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+
+    .replaceAll("&", "&amp;")
+
+    .replaceAll("<", "&lt;")
+
+    .replaceAll(">", "&gt;")
+
+    .replaceAll('"', "&quot;")
+
+    .replaceAll("'", "&#039;");
+
 }
 
 
@@ -520,9 +655,16 @@ checkButton.addEventListener(
   checkDatabase
 );
 
-geocodeButton.addEventListener(
+
+startButton.addEventListener(
   "click",
-  geocodeAll
+  startBatch
+);
+
+
+checkBatchButton.addEventListener(
+  "click",
+  checkBatch
 );
 
 </script>

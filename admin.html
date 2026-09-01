@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -9,11 +11,13 @@
 
   <title>Админ — Адреса клиентов</title>
 
+
   <style>
 
     * {
       box-sizing: border-box;
     }
+
 
     :root {
       --green: #159447;
@@ -26,10 +30,12 @@
       --card: #fff;
     }
 
+
     body {
       margin: 0;
       background: var(--bg);
       color: var(--black);
+
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -39,6 +45,7 @@
         sans-serif;
     }
 
+
     .app {
       width: 100%;
       max-width: 900px;
@@ -46,10 +53,12 @@
       padding: 20px;
     }
 
+
     h1 {
       margin: 5px 0 6px;
       font-size: 28px;
     }
+
 
     .subtitle {
       color: var(--gray);
@@ -58,20 +67,24 @@
       line-height: 1.45;
     }
 
+
     .card {
       background: var(--card);
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 16px;
+
       box-shadow:
         0 2px 12px rgba(0,0,0,.06);
     }
+
 
     .title {
       font-size: 18px;
       font-weight: 800;
       margin-bottom: 14px;
     }
+
 
     .drop {
       border: 2px dashed #bbb;
@@ -81,16 +94,19 @@
       background: #fafafa;
     }
 
+
     .drop.drag {
       border-color: var(--blue);
       background: #f1f7ff;
     }
+
 
     .drop strong {
       display: block;
       font-size: 17px;
       margin-bottom: 8px;
     }
+
 
     .drop span {
       display: block;
@@ -99,53 +115,67 @@
       margin-bottom: 15px;
     }
 
+
     input[type="file"] {
       width: 100%;
       max-width: 400px;
     }
+
 
     button {
       width: 100%;
       border: 0;
       border-radius: 11px;
       padding: 14px;
+
       background: var(--black);
       color: white;
+
       font-size: 16px;
       font-weight: 800;
+
       cursor: pointer;
       margin-top: 12px;
     }
+
 
     button:disabled {
       opacity: .45;
       cursor: default;
     }
 
+
     .status {
       padding: 14px;
       border-radius: 11px;
+
       background: #f0f0f0;
       color: #555;
+
       font-size: 14px;
       line-height: 1.5;
+
       white-space: pre-line;
     }
+
 
     .status.success {
       background: #e9f7ee;
       color: #176b35;
     }
 
+
     .status.error {
       background: #fdecec;
       color: #9e2020;
     }
 
+
     .progress-wrap {
       display: none;
       margin-top: 15px;
     }
+
 
     .progress {
       height: 12px;
@@ -154,12 +184,17 @@
       overflow: hidden;
     }
 
+
     .progress-bar {
       width: 0%;
       height: 100%;
+
       background: var(--blue);
-      transition: width .4s ease;
+
+      transition:
+        width .4s ease;
     }
+
 
     .progress-text {
       margin-top: 8px;
@@ -167,13 +202,17 @@
       font-size: 13px;
     }
 
+
     .stats {
       display: none;
+
       grid-template-columns:
         repeat(3, 1fr);
+
       gap: 10px;
       margin-top: 15px;
     }
+
 
     .stat {
       background: #f3f3f3;
@@ -182,10 +221,12 @@
       text-align: center;
     }
 
+
     .stat-number {
       font-size: 25px;
       font-weight: 800;
     }
+
 
     .stat-label {
       margin-top: 3px;
@@ -193,22 +234,34 @@
       font-size: 12px;
     }
 
+
     .info {
       margin: 0;
-      padding-left: 20px;
-      line-height: 1.7;
+      padding-left: 22px;
+
+      line-height: 1.8;
       font-size: 14px;
     }
+
 
     .warning {
       padding: 12px;
       border-radius: 10px;
+
       background: #fff5d6;
       color: #765600;
+
       font-size: 13px;
       line-height: 1.5;
+
       margin-top: 12px;
     }
+
+
+    .required {
+      font-weight: 800;
+    }
+
 
     @media (max-width: 600px) {
 
@@ -216,13 +269,16 @@
         padding: 10px;
       }
 
+
       h1 {
         font-size: 23px;
       }
 
+
       .card {
         padding: 15px;
       }
+
 
       .stats {
         grid-template-columns: 1fr;
@@ -231,25 +287,40 @@
     }
 
   </style>
+
 </head>
+
 
 <body>
 
+
 <div class="app">
 
-  <h1>Админ — Адреса клиентов</h1>
+
+  <h1>
+    Админ — Адреса клиентов
+  </h1>
+
 
   <div class="subtitle">
+
     Тестовая загрузка базы магазинов.
     Рабочий сайт не используется.
+
   </div>
 
 
+  <!-- =====================================================
+       UPLOAD
+       ===================================================== -->
+
   <div class="card">
+
 
     <div class="title">
       Загрузить новый Excel
     </div>
+
 
     <div
       id="drop"
@@ -260,9 +331,11 @@
         Выберите Excel-файл
       </strong>
 
+
       <span>
-        Формат .xlsx
+        Формат .xlsx или .xls
       </span>
+
 
       <input
         id="file"
@@ -283,11 +356,17 @@
   </div>
 
 
+  <!-- =====================================================
+       STATUS
+       ===================================================== -->
+
   <div class="card">
+
 
     <div class="title">
       Статус
     </div>
+
 
     <div
       id="status"
@@ -310,6 +389,7 @@
         ></div>
 
       </div>
+
 
       <div
         id="progressText"
@@ -378,50 +458,119 @@
   </div>
 
 
+  <!-- =====================================================
+       EXCEL REQUIREMENTS
+       ===================================================== -->
+
   <div class="card">
+
 
     <div class="title">
       Требования к Excel
     </div>
 
+
     <ol class="info">
 
-      <li>
+
+      <li class="required">
         Категория
       </li>
 
-      <li>
+
+      <li class="required">
+        Область / край
+      </li>
+
+
+      <li class="required">
         Город
       </li>
 
-      <li>
+
+      <li class="required">
         Адрес магазина
       </li>
+
 
       <li>
         Контрагент — необязательно
       </li>
+
 
     </ol>
 
 
     <div class="warning">
 
+      <strong>
+        Важно:
+      </strong>
+
+      область / край обязательно должен
+      присутствовать для каждого адреса.
+
+      Именно область используется вместе
+      с городом для более точного определения
+      координат магазина.
+
+      <br><br>
+
+      Пример:
+
+      <br>
+
+      Категория: A
+
+      <br>
+
+      Область / край: Республика Хакасия
+
+      <br>
+
+      Город: Абакан
+
+      <br>
+
+      Адрес магазина: ул. Некрасова, 22В
+
+      <br>
+
+      Контрагент: Семиренко Ольга г. Абакан
+
+    </div>
+
+
+    <div class="warning">
+
       Категории A, B, C и D поддерживаются.
-      После загрузки новая база заменяет
-      предыдущую тестовую базу.
+
+      После загрузки новая база полностью
+      заменяет предыдущую тестовую базу.
 
     </div>
 
   </div>
+
 
 </div>
 
 
 <script>
 
+
+/* =========================================================
+   API
+   ========================================================= */
+
+
 const API_URL =
   "https://fn.tatnet.cloud/d81fff77-caeb-4e02-b374-407e2b3486f0/f55c92b9-2fb7-44a3-a0b7-0c7bc16ff784";
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
 
 
 const fileInput =
@@ -429,35 +578,42 @@ const fileInput =
     "file"
   );
 
+
 const uploadBtn =
   document.getElementById(
     "uploadBtn"
   );
+
 
 const status =
   document.getElementById(
     "status"
   );
 
+
 const drop =
   document.getElementById(
     "drop"
   );
+
 
 const progressWrap =
   document.getElementById(
     "progressWrap"
   );
 
+
 const progressBar =
   document.getElementById(
     "progressBar"
   );
 
+
 const progressText =
   document.getElementById(
     "progressText"
   );
+
 
 const stats =
   document.getElementById(
@@ -473,6 +629,7 @@ let selectedFile =
    STATUS
    ========================================================= */
 
+
 function setStatus(
   message,
   type = ""
@@ -482,7 +639,8 @@ function setStatus(
     message;
 
   status.className =
-    "status " + type;
+    "status " +
+    type;
 
 }
 
@@ -490,6 +648,7 @@ function setStatus(
 /* =========================================================
    FILE SELECT
    ========================================================= */
+
 
 fileInput.addEventListener(
   "change",
@@ -508,6 +667,7 @@ fileInput.addEventListener(
 /* =========================================================
    DRAG & DROP
    ========================================================= */
+
 
 drop.addEventListener(
   "dragover",
@@ -545,16 +705,23 @@ drop.addEventListener(
       "drag"
     );
 
+
     selectedFile =
       event.dataTransfer.files?.[0] ||
       null;
 
+
     if (selectedFile) {
 
-      fileInput.files =
-        event.dataTransfer.files;
+      try {
+
+        fileInput.files =
+          event.dataTransfer.files;
+
+      } catch {}
 
     }
+
 
     updateFileState();
 
@@ -565,6 +732,7 @@ drop.addEventListener(
 /* =========================================================
    UPDATE FILE STATE
    ========================================================= */
+
 
 function updateFileState() {
 
@@ -609,12 +777,14 @@ function updateFileState() {
 
 
   setStatus(
+
     "Файл выбран: " +
     selectedFile.name +
     "\nРазмер: " +
     formatBytes(
       selectedFile.size
     )
+
   );
 
 }
@@ -623,6 +793,7 @@ function updateFileState() {
 /* =========================================================
    FILE → BASE64
    ========================================================= */
+
 
 function fileToBase64(
   file
@@ -701,6 +872,7 @@ function fileToBase64(
    API
    ========================================================= */
 
+
 async function api(
   payload
 ) {
@@ -735,16 +907,21 @@ async function api(
 
   let data;
 
+
   try {
 
     data =
-      JSON.parse(text);
+      JSON.parse(
+        text
+      );
 
   } catch {
 
     throw new Error(
+
       "Сервер вернул некорректный ответ:\n" +
       text
+
     );
 
   }
@@ -753,9 +930,11 @@ async function api(
   if (!response.ok) {
 
     throw new Error(
+
       data.error ||
       "HTTP " +
       response.status
+
     );
 
   }
@@ -766,8 +945,10 @@ async function api(
   ) {
 
     throw new Error(
+
       data.error ||
       "Ошибка сервера."
+
     );
 
   }
@@ -782,6 +963,7 @@ async function api(
    UPLOAD
    ========================================================= */
 
+
 uploadBtn.addEventListener(
   "click",
   upload
@@ -791,7 +973,9 @@ uploadBtn.addEventListener(
 async function upload() {
 
   if (!selectedFile) {
+
     return;
+
   }
 
 
@@ -821,6 +1005,7 @@ async function upload() {
 
 
   try {
+
 
     const base64 =
       await fileToBase64(
@@ -857,7 +1042,9 @@ async function upload() {
     ) {
 
       throw new Error(
+
         "Сервер не запустил обработку адресов."
+
       );
 
     }
@@ -868,21 +1055,26 @@ async function upload() {
 
 
     progressText.textContent =
+
       "Geoapify обрабатывает " +
       uploaded.total +
       " адресов...";
 
 
     setStatus(
+
       "Excel загружен.\n" +
       "Запущено определение координат."
+
     );
 
 
     await waitForCompletion();
 
 
-  } catch (error) {
+  } catch (
+    error
+  ) {
 
     console.error(
       error
@@ -890,9 +1082,12 @@ async function upload() {
 
 
     setStatus(
+
       "Ошибка:\n" +
       error.message,
+
       "error"
+
     );
 
 
@@ -909,8 +1104,9 @@ async function upload() {
 
 
 /* =========================================================
-   WAIT
+   WAIT FOR GEOCODING
    ========================================================= */
+
 
 async function waitForCompletion() {
 
@@ -928,12 +1124,14 @@ async function waitForCompletion() {
     timeout
   ) {
 
+
     await sleep(
       4000
     );
 
 
     let data;
+
 
     try {
 
@@ -945,12 +1143,9 @@ async function waitForCompletion() {
 
         });
 
-    } catch (error) {
-
-      /*
-         Иногда batch ещё не готов.
-         Повторяем запрос.
-      */
+    } catch (
+      error
+    ) {
 
       console.warn(
         error
@@ -971,12 +1166,15 @@ async function waitForCompletion() {
 
 
       progressText.textContent =
+
         "Geoapify ещё обрабатывает адреса...";
 
 
       setStatus(
+
         "Обработка продолжается.\n" +
         "Пожалуйста, не закрывайте страницу."
+
       );
 
 
@@ -989,6 +1187,7 @@ async function waitForCompletion() {
       data.status ===
       "completed"
     ) {
+
 
       progressBar.style.width =
         "100%";
@@ -1006,7 +1205,7 @@ async function waitForCompletion() {
       setStatus(
 
         "Новая база успешно загружена.\n" +
-        "Теперь карта может использовать её.",
+        "Координаты адресов обновлены.",
 
         "success"
 
@@ -1025,7 +1224,9 @@ async function waitForCompletion() {
 
 
   throw new Error(
+
     "Время ожидания истекло. Проверь статус функции TatNet."
+
   );
 
 }
@@ -1034,6 +1235,7 @@ async function waitForCompletion() {
 /* =========================================================
    STATS
    ========================================================= */
+
 
 function showStats(
   data
@@ -1070,6 +1272,7 @@ function showStats(
    HELPERS
    ========================================================= */
 
+
 function sleep(
   ms
 ) {
@@ -1100,12 +1303,15 @@ function formatBytes(
 
 
   if (
-    bytes < 1024 * 1024
+    bytes <
+    1024 * 1024
   ) {
 
     return (
+
       bytes /
       1024
+
     ).toFixed(1) +
       " КБ";
 
@@ -1113,15 +1319,19 @@ function formatBytes(
 
 
   return (
+
     bytes /
     1024 /
     1024
+
   ).toFixed(1) +
     " МБ";
 
 }
 
+
 </script>
+
 
 </body>
 </html>
